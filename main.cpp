@@ -145,6 +145,32 @@ public:
     bool operator==(const Medicament& other) {
         return this->nrIngrediente == other.nrIngrediente;
     }
+
+    // >> pentru citire
+    friend istream& operator>>(istream& input, Medicament& medicament) {
+    cout << "Introduceti numele medicamentului: ";
+    input >> medicament.nume;
+    cout << "Introduceti pretul cutiei: ";
+    input >> medicament.pretCutie;
+    cout << "Introduceti numarul de ingrediente principale: ";
+    input >> medicament.nrIngrediente;
+    medicament.ingredientePrincipale = new string[medicament.nrIngrediente];
+    cout << "Introduceti ingredientele principale:\n";
+    for (int i = 0; i < medicament.nrIngrediente; ++i) {
+        input >> medicament.ingredientePrincipale[i];
+    }
+    return input;
+    }
+
+    // << pentru afisare
+    friend ostream& operator<<(ostream& output, const Medicament& medicament) {
+        output << "Numele medicamentului: " << medicament.nume << "\nPret cutie: " << medicament.pretCutie << "\nID: " << medicament.id << "\nAcesta contine " << medicament.nrIngrediente << " ingrediente principale: ";
+        for (int i = 0; i < medicament.nrIngrediente - 1; i++)
+            output << medicament.ingredientePrincipale[i] << ", ";
+        output << medicament.ingredientePrincipale[medicament.nrIngrediente - 1] << ".\n";
+        return output;
+    }
+
 };
 int Medicament::contor = 0;
 // functia prietena cu clasa Medicament
@@ -296,6 +322,31 @@ public:
     bool operator==(const Pacient& other) {
         return this->varsta == other.varsta;
     }
+
+    // >> pentru citire
+    friend istream& operator>>(istream& input, Pacient& pacient) {
+        cout << "Introduceti numele pacientului: ";
+        input >> pacient.nume;
+        cout << "Introduceti varsta pacientului: ";
+        input >> pacient.varsta;
+        cout << "Introduceti numarul de afectiuni: ";
+        input >> pacient.nrAfectiuni;
+        pacient.afectiuni = new string[pacient.nrAfectiuni];
+        cout << "Introduceti afectiunile pacientului:\n";
+        for (int i = 0; i < pacient.nrAfectiuni; ++i) {
+            input >> pacient.afectiuni[i];
+        }
+        return input;
+    }
+
+    // << pentru afisare
+    friend ostream& operator<<(ostream& output, const Pacient& pacient) {
+        output << "Pacient: " << pacient.nume << "\nVarsta: " << pacient.varsta << " ani\nCNP: " << pacient.CNP << "\nNr. telefon: " << pacient.nrTelefon << "\nAcesta sufera de " << pacient.nrAfectiuni << " afectiuni:\n";
+        for (int i = 0; i < pacient.nrAfectiuni - 1; i++)
+            output << i + 1 << ". " << pacient.afectiuni[i] << ",\n";
+        output << pacient.nrAfectiuni << ". " << pacient.afectiuni[pacient.nrAfectiuni - 1] << ".\n\n";
+        return output;
+    }
 };
 int Pacient::contorFisePacienti = 0;
 
@@ -438,6 +489,33 @@ public:
     bool operator==(const Aparatura& other) {
         return this->pret == other.pret;
     }
+
+    // >> pentru citire
+    friend istream& operator>>(istream& input, Aparatura& aparat) {
+    cout << "Introduceti denumirea aparatului: ";
+    input >> aparat.denumire;
+    cout << "Introduceti pretul aparatului: ";
+    input >> aparat.pret;
+    cout << "Introduceti sectia aparatului: ";
+    input >> aparat.sectie;
+    cout << "Introduceti numarul de medici care folosesc aparatul: ";
+    input >> aparat.nrMediciCareFolosescAparatul;
+    aparat.numeMediciCareFolosescAparatul = new string[aparat.nrMediciCareFolosescAparatul];
+    cout << "Introduceti numele medicilor care folosesc aparatul:\n";
+    for (int i = 0; i < aparat.nrMediciCareFolosescAparatul; ++i) {
+        input >> aparat.numeMediciCareFolosescAparatul[i];
+    }
+    return input;
+}
+
+    // << pentru afisare
+    friend ostream& operator<<(ostream& output, const Aparatura& aparat) {
+        output << "Denumire aparat: " << aparat.denumire << "\nPret: " << aparat.pret << "\nSectie: " << aparat.sectie << "\nTVA: " << aparat.TVA << "\nMarca: " << aparat.marca << "\nMedicii care pot folosi aparatul sunt urmatorii: ";
+        for (int i = 0; i < aparat.nrMediciCareFolosescAparatul - 1; i++)
+            output << aparat.numeMediciCareFolosescAparatul[i] << ", ";
+        output << aparat.numeMediciCareFolosescAparatul[aparat.nrMediciCareFolosescAparatul - 1] << ".\n";
+    return output;
+    }
 };
 float Aparatura::TVA = 0.19;
 // functia prietena cu clasa Aparatura
@@ -447,6 +525,104 @@ void afisareAparatura(const Aparatura& aparat) {
         cout <<aparat.numeMediciCareFolosescAparatul[i] << ", ";
     cout << aparat.numeMediciCareFolosescAparatul[aparat.nrMediciCareFolosescAparatul - 1] << ".\n";
 }
+
+class Reteta {
+private:
+    Medicament* medicamentPrescris;
+    bool decontataIntegral;
+    string doctorCurant;
+    Pacient beneficiar;
+
+public:
+    // constructor
+    Reteta() : medicamentPrescris(nullptr), decontataIntegral(false), doctorCurant(""), beneficiar() {}
+
+    // destructor
+    ~Reteta() {
+        delete medicamentPrescris;
+    }
+
+    // getter si setter pentru medicamentPrescris
+    void setMedicamentPrescris(Medicament* medicament) {
+        this->medicamentPrescris = medicament;
+    }
+
+    Medicament* getMedicamentPrescris() const {
+        return this->medicamentPrescris;
+    }
+
+    // getter si setter pt decontataIntegral
+    void setDecontataIntegral(bool decontata) {
+        this->decontataIntegral = decontata;
+    }
+
+    bool getDecontataIntegral() const {
+        return this->decontataIntegral;
+    }
+
+    // getter si setter pt doctorCurant
+    void setDoctorCurant(const string& doctor) {
+        this->doctorCurant = doctor;
+    }
+
+    string getDoctorCurant() const {
+        return this->doctorCurant;
+    }
+
+    // getter si setter pt beneficiar
+    void setBeneficiar(const Pacient& pacient) {
+        this->beneficiar = pacient;
+    }
+
+    Pacient getBeneficiar() const {
+        return this->beneficiar;
+    }
+
+    // supraincarcare operator atribuire =
+    Reteta& operator=(const Reteta& reteta) {
+        if (this != &reteta) {
+            delete medicamentPrescris;
+            this->medicamentPrescris = new Medicament(*reteta.medicamentPrescris);
+            this->decontataIntegral = reteta.decontataIntegral;
+            this->doctorCurant = reteta.doctorCurant;
+            this->beneficiar = reteta.beneficiar;
+        }
+        return *this;
+    }
+
+    // operator de output
+    friend ostream& operator<<(ostream& out, const Reteta& reteta) {
+    out << "Medicament prescris: " << reteta.medicamentPrescris->getNume() << endl;
+    out << "Decontata integral: " << boolalpha << reteta.decontataIntegral << endl;
+    out << "Doctor curant: " << reteta.doctorCurant << endl;
+    out << "Beneficiar: " << reteta.beneficiar.getNume() << endl;
+    return out;
+}
+
+
+    // Ooperator de input
+    friend istream& operator>>(istream& in, Reteta& reteta) {
+        Medicament* med = new Medicament();
+        Pacient pac;
+        cout << "Care dintre pacientii nostri este? "<<endl;
+        in >> pac;
+        reteta.setBeneficiar(pac);
+
+        cout << "Care medicament este prescris? "<<endl;
+        in >> *med;
+        reteta.setMedicamentPrescris(med);
+
+        cout << "Este decontata integral? (true/false): ";
+        in >> boolalpha >> reteta.decontataIntegral;
+
+        cout << "Medicul ce a prescris reteta: ";
+        in.ignore(); // ignora newline characters din inputul anterior, deoarece daca nu fac asta nu se poate realiza citirea
+        getline(in, reteta.doctorCurant);
+
+        return in;
+    }
+};
+
 
 int main() {
 // Pentru Medicament
@@ -560,6 +736,62 @@ cout << aparat4.getDenumire() << " si " << aparat1.getDenumire() << " au acelasi
 
 cout<<endl;
 }
-   
+
+// declar vectorii
+int nrMed, nrPac, nrApar;
+cout<<"Dimensiunea vectorului de medicamente: ";
+cin>>nrMed;
+cout<<"Dimensiunea vectorului de pacienti: ";
+cin>>nrPac;
+cout<<"Dimensiunea vectorului de aparate medicale: ";
+cin>>nrApar;
+Medicament vectorMedicamente[nrMed];
+Pacient vectorPacienti[nrPac];
+Aparatura vectorAparate[nrApar];
+
+// Pentru citirea obiectelor de la tastatură
+    cout << "Introduceti date pentru vectorul de medicamente:\n";
+    for (int i = 0; i < nrMed; ++i) {
+        cout << "Medicament " << i + 1 << ":\n";
+        cin >> vectorMedicamente[i];
+    }
+
+    cout << "Introduceti date pentru vectorul de pacienti:\n";
+    for (int i = 0; i < nrPac; ++i) {
+        cout << "Pacient " << i + 1 << ":\n";
+        cin >> vectorPacienti[i];
+    }
+
+    cout << "Introduceti date pentru vectorul de aparate medicale:\n";
+    for (int i = 0; i < nrApar; ++i) {
+        cout << "Aparat " << i + 1 << ":\n";
+        cin >> vectorAparate[i];
+    }
+    // Pentru afișarea obiectelor
+    cout << "\nAfisare vector de medicamente:\n";
+    for (int i = 0; i < nrMed; ++i) {
+        cout << "Medicament " << i + 1 << ":\n";
+        cout << vectorMedicamente[i];
+        cout << endl;
+    }
+
+    cout << "\nAfisare vector de pacienti:\n";
+    for (int i = 0; i < nrPac; ++i) {
+        cout << "Pacient " << i + 1 << ":\n";
+        cout << vectorPacienti[i];
+        cout << endl;
+    }
+
+    cout << "\nAfisare vector de aparate medicale:\n";
+    for (int i = 0; i < nrApar; ++i) {
+        cout << "Aparatul " << i + 1 << ":\n";
+        cout << vectorAparate[i];
+        cout << endl;
+    }
+
+    // clasa Reteta ce contine relatii has-a
+    Reteta reteta;
+    cin >> reteta;
+    cout << reteta;
    return 0;
 }
