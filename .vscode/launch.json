@@ -6,8 +6,8 @@
       "type": "lldb",
       "request": "launch",
       "args": [],
-      "cwd": "/Users/dariamirestean/Documents/facultate/POO/proiectPOO/Mirestean_Daria_ProiectPOO",
-      "program": "/Users/dariamirestean/Documents/facultate/POO/proiectPOO/Mirestean_Daria_ProiectPOO/build/Debug/outDebug"
+      "cwd": "/Users/dariamirestean/Documents/facultate/Mirestean_Daria_ProiectPOO",
+      "program": "/Users/dariamirestean/Documents/facultate/Mirestean_Daria_ProiectPOO/build/Debug/outDebug"
     }
   ]
 }
