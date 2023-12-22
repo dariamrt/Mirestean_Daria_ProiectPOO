@@ -50,7 +50,7 @@ public:
         this->contor++;
     }
 
-    void afisare(){
+    void afisare() const {
         cout << "Numele medicamentului: " << this->nume << "\nPret cutie: " << this->pretCutie << "\nID: " << this->id << "\nAcesta contine "<<this->nrIngrediente<<" ingrediente principale: ";
         for (int i = 0; i < this->nrIngrediente - 1; i++)
             cout << this->ingredientePrincipale[i] << ", ";
@@ -297,7 +297,7 @@ public:
         this->nrTelefon = nrTelefon;
     }
 
-    void afisare() {
+    void afisare() const {
         cout << "Pacient: " << this->nume << "\nVarsta: " << this->varsta << " ani\nCNP: " << this->CNP << "\nNr. telefon: " << this->nrTelefon << "\nAcesta sufera de " << this->nrAfectiuni << " afectiuni:\n";
         for (int i = 0; i < this->nrAfectiuni - 1; i++)
             cout << i+1<<". "<< this->afectiuni[i] << ",\n";
@@ -573,6 +573,7 @@ void afisareAparatura(const Aparatura& aparat) {
     cout << aparat.numeMediciCareFolosescAparatul[aparat.nrMediciCareFolosescAparatul - 1] << ".\n";
 }
 
+// has-a
 class Reteta {
 private:
     Medicament* medicamentPrescris;
@@ -669,6 +670,90 @@ public:
         return in;
     }
 };
+
+// is-a
+// clasa PreparatFarmaceutic, fiind in relatie de is-a cu Medicament
+class PreparatFarmaceutic : public Medicament{
+private:
+    float concentratie;
+public:
+    // constructor implicit
+    PreparatFarmaceutic() : Medicament(), concentratie(0.0) {}
+
+    // getteri si setteri
+    float getConcentratie() const {
+        return concentratie;
+    }
+
+    void setConcentratie(float concentratie) {
+        this->concentratie = concentratie;
+    }
+
+    // supraincarcarea operatorului >> pentru citire
+    friend istream& operator>>(istream& input, PreparatFarmaceutic& preparat) {
+        // folosesc op >> supraincarcat in clasa de baza Medicament
+        input >> static_cast<Medicament&>(preparat);
+        
+        // citesc atributele in plus ale PreparatFarmaceutic
+        cout << "Concentratia preparatului farmaceutic: ";
+        input >> preparat.concentratie;
+        
+        return input;
+    }
+
+    // afisare
+    void afisare() const {
+        Medicament::afisare();
+        cout << "\nConcentratia preparatului farmaceutic: " << concentratie << endl;
+    }
+
+    // destructor
+    ~PreparatFarmaceutic(){
+        // ajutor pls
+    }
+};
+
+// clasa PacientSpecial in relatie de is-a cu Pacient
+class PacientSpecial : public Pacient {
+private:
+    string boalaExtra;
+public:
+    // constructor implicit
+    PacientSpecial() : Pacient(), boalaExtra("Febra Galbena") {}
+
+    // getteri si setteri
+    string getBoalaExtra() const {
+        return boalaExtra;
+    }
+
+    void setBoalaExtra(const string& boalaExtra) {
+        this->boalaExtra = boalaExtra;
+    }
+
+    // supraincarc operatorul >> pentru citire
+    friend istream& operator>>(istream& input, PacientSpecial& pacient) {
+        // folosesc op >> de citire din clasa de baza Pacient
+        input >> static_cast<Pacient&>(pacient);
+        
+        // citesc atributul in plus al PacientSpecial
+        cout << "Boala speciala a pacientului: ";
+        input >> pacient.boalaExtra;
+        
+        return input;
+    }
+
+    // afisare
+    void afisare() const {
+        Pacient::afisare();
+        cout << "Boala speciala a sa: " << boalaExtra << endl;
+    }
+
+    // destructor
+    ~PacientSpecial(){
+        // ajutor pls
+    }
+};
+
 
 // FISIERE BINARE
 // afisarea datelor in fisierul binar medicament.bin
@@ -873,6 +958,7 @@ void citireBinaraPacient()
     }
 }
 int main() {
+/*
 // Pentru Medicament
  {
 // creez medicamentele cu constructorii
@@ -1059,5 +1145,17 @@ Aparatura vectorAparate[nrApar];
     
     afisareBinaraPacient();
     citireBinaraPacient();
+    */
+
+   // PreparatFarmaceutic si Pacient Special
+   PreparatFarmaceutic preparat1;
+   cin >> preparat1;
+   cout << "\nDetaliile preparatului farmaceutic sunt:\n";
+   preparat1.afisare();
+
+   PacientSpecial pacientSpecial1;
+   cin >> pacientSpecial1;
+   cout << "\nDetaliile pacientului special sunt:\n";
+   pacientSpecial1.afisare();
    return 0;
 }
