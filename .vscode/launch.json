@@ -8,6 +8,19 @@
       "args": [],
       "cwd": "/Users/dariamirestean/Documents/facultate/POO/Mirestean_Daria_ProiectPOO",
       "program": "/Users/dariamirestean/Documents/facultate/POO/Mirestean_Daria_ProiectPOO/build/Debug/outDebug"
+    },
+    {
+      "name": "C/C++: clang build and debug active file",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${fileDirname}/${fileBasenameNoExtension}",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${fileDirname}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "preLaunchTask": "C/C++: clang build active file"
     }
   ]
 }
