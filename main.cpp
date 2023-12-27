@@ -6,6 +6,10 @@
 #include <istream>
 using namespace std;
 
+/* Am incercat să structurez codul cât mai bine, folosind și comentarii. 
+Totuși, am realizat și un README.md în care am oferit informații mai detaliate despre structura proiectului și funcționalități.
+*/
+
 // două clase abstracte care să fie moștenite de către clasele pe care le am deja de la început
 // clasa abstracta Spital
 class Spital{
@@ -1084,7 +1088,6 @@ void citireBinaraPacient()
 }
 
 int main() {
-/*
 // FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
 // pentru Medicament
  {
@@ -1304,7 +1307,6 @@ Aparatura vectorAparate[nrApar];
    cin >> pacientSpecial1;
    cout << "\nDetaliile pacientului special sunt:\n";
    pacientSpecial1.afisare();
-   */
 
 
   // FAZA 8: clase abstracte, functii virtuale, late binding
