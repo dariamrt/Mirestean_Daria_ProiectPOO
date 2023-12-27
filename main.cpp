@@ -143,7 +143,7 @@ public:
     }
 
     int getId() const {
-        return id;
+        return this->id;
     }
 
     int getNrIngrediente() const {
@@ -151,7 +151,7 @@ public:
     }
 
     string* getIngredientePrincipale() const {
-        return ingredientePrincipale;
+        return this->ingredientePrincipale;
     }   
 
     static int getContor() {
@@ -179,7 +179,6 @@ public:
     ~Medicament(){
         if (ingredientePrincipale != nullptr) {
             delete[] ingredientePrincipale;
-            ingredientePrincipale = nullptr;
         }
     }
 
@@ -367,6 +366,10 @@ public:
         return nrTelefon;
     }
 
+    int getContorFisePacienti() const {
+        return contorFisePacienti;
+    }
+
     long getCNP() const {
         return CNP;
     }
@@ -405,12 +408,12 @@ public:
         for(int i=0; i<this->nrAfectiuni;i++)
             this->afectiuni[i] = afectiuni1[i]; 
     }
+
     // destructorul
     ~Pacient(){
-        if (afectiuni != NULL) {
+        if (afectiuni != NULL)
             delete[] afectiuni;
-            afectiuni = NULL;
-        }
+
     }
 
     // supraincarcarea operatorilor
@@ -606,12 +609,25 @@ public:
     void setSectie(const string& sectie) {
         this->sectie = sectie;
     }
+
+    void setNrMediciCareFolosescAparatul(int nrMediciCareFolosescAparatul)  {
+        this->nrMediciCareFolosescAparatul = nrMediciCareFolosescAparatul;
+    }
+
+    void setNumeMediciCareFolosescAparatul(string* numeMediciCareFolosescAparatul){
+        if (this->numeMediciCareFolosescAparatul != NULL)
+        {
+            delete[] this->numeMediciCareFolosescAparatul;
+        }
+        this->numeMediciCareFolosescAparatul = new string[this->nrMediciCareFolosescAparatul];
+        for(int i=0; i<this->nrMediciCareFolosescAparatul;i++)
+            this->numeMediciCareFolosescAparatul[i] = numeMediciCareFolosescAparatul[i]; 
+    }
+
     // destructorul
     ~Aparatura() {
-        if (numeMediciCareFolosescAparatul != NULL){
+        if (numeMediciCareFolosescAparatul != NULL)
             delete[] numeMediciCareFolosescAparatul;
-            numeMediciCareFolosescAparatul = NULL;
-        }
     }
 
     // supraincarcare operatorilor
@@ -705,7 +721,8 @@ public:
 
     // destructor
     ~Reteta() {
-        delete medicamentPrescris;
+        if(medicamentPrescris != NULL) 
+            delete[] medicamentPrescris;
     }
 
     // metode de acces si de modificare pentru atributele clasei
@@ -1133,6 +1150,36 @@ cout << "Diferenta de pret dintre "<< medicament2.getNume() <<" si "<< medicamen
 // operatorul == folosit pentru a vedea daca 2 medicamente au acelasi numar de ingrediente
 bool acelasiNrIngrediente = medicament4 == medicament2; // apelul operatorului ==
 cout << "Au acelasi numar de ingrediente "<< medicament2.getNume() <<" si "<< medicament3.getNume() <<"? "<< acelasiNrIngrediente << endl;
+
+// testarea getterilor si a setterilor in main
+cout << "Testarea getter Nume: " << medicament1.getNume() << endl;
+medicament1.setNume("Nurofen");
+cout << "Testarea daca setter pretCutie a functionat: " << medicament1.getNume() << endl;
+
+cout << "Testarea getter Nume: " << medicament1.getPretCutie() << endl;
+medicament1.setPretCutie(13);
+cout << "Testarea daca setter pretCutie a functionat: " << medicament1.getPretCutie() << endl;
+
+cout << "Testarea getter id: " << medicament1.getId() << endl;
+cout << "Testarea getter contor: " << medicament2.getContor() << endl;
+
+cout << "Testarea getter nrIngrediente: " << medicament1.getNrIngrediente() << endl;
+cout << "Testarea getter ingredientePrincipale: ";
+string* ingredienteInitiale = medicament1.getIngredientePrincipale();
+for (int i = 0; i < medicament1.getNrIngrediente(); ++i) {
+        cout << ingredienteInitiale[i] << ", ";
+    }
+cout << endl;
+medicament1.setNrIngrediente(2);
+cout << "Testarea daca setter nrIngrediente a functionat" << medicament1.getNrIngrediente() << endl;
+string ingredienteNoi[] = {"Celuloza", "Lactoza"};
+medicament1.setIngredientePrincipale(ingredienteNoi);
+cout << "Ingrediente actualizate: ";
+ingredienteInitiale = medicament1.getIngredientePrincipale();
+for (int i = 0; i < medicament1.getNrIngrediente(); ++i) {
+    cout << ingredienteInitiale[i] << ", ";
+}
+cout << endl;
 
 cout<<endl;
 }
