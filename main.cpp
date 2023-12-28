@@ -55,7 +55,6 @@ public:
     }
 };
 
-
 // cele 3 clase de la început - Medicament, Pacient, Aparatura
 class Medicament : public Farmacie{
 private:
@@ -167,12 +166,16 @@ public:
         this->pretCutie = pretCutie;
     }
 
-    void setNrIngrediente(int nrIngrediente){
-        this->nrIngrediente = nrIngrediente;
+    void setIngredientePrincipale(string* ingrediente, int nrIngrediente) {
+    if (ingredientePrincipale != nullptr) {
+        delete[] ingredientePrincipale; // eliberez memoria alocata anterior
     }
-
-    void setIngredientePrincipale(string* ingrediente) {
-        this->ingredientePrincipale = ingrediente;
+    
+    this->nrIngrediente = nrIngrediente;
+    this->ingredientePrincipale = new string[nrIngrediente];
+    for (int i = 0; i < nrIngrediente; ++i) {
+        this->ingredientePrincipale[i] = ingrediente[i]; // aloc noul vector
+    }
     }
 
     // destructorul 
@@ -216,7 +219,7 @@ public:
     // >> pentru citire
     friend istream& operator>>(istream& input, Medicament& medicament) {
     cout << "Introduceti numele medicamentului: ";
-    input >> medicament.nume;
+    getline(input, medicament.nume);
     cout << "Introduceti pretul cutiei: ";
     input >> medicament.pretCutie;
     cout << "Introduceti numarul de ingrediente principale: ";
@@ -224,7 +227,7 @@ public:
     medicament.ingredientePrincipale = new string[medicament.nrIngrediente];
     cout << "Introduceti ingredientele principale:\n";
     for (int i = 0; i < medicament.nrIngrediente; ++i) {
-        input >> medicament.ingredientePrincipale[i];
+        getline(input, medicament.ingredientePrincipale[i]);
     }
     return input;
     }
@@ -395,19 +398,18 @@ public:
         this->nrTelefon = nrTelefon;
     }
 
-    void setNrAfectiuni(int nrAfectiuni){
-        this->nrAfectiuni = nrAfectiuni;
+    void setAfectiuni(string* afectiuni, int nrAfectiuni) {
+    if (this->afectiuni != nullptr) {
+        delete[] this->afectiuni; // eliberez memoria alocata anterior
     }
+    
+    this->nrAfectiuni = nrAfectiuni;
+    this->afectiuni = new string[nrAfectiuni];
+    for (int i = 0; i < nrAfectiuni; ++i) {
+        this->afectiuni[i] = afectiuni[i]; // aloc noul vector
+    }
+}
 
-    void setAfectiuni(string* afectiuni1){
-        if (this->afectiuni != NULL)
-        {
-            delete[] this->afectiuni;
-        }
-        this->afectiuni = new string[this->nrAfectiuni];
-        for(int i=0; i<this->nrAfectiuni;i++)
-            this->afectiuni[i] = afectiuni1[i]; 
-    }
 
     // destructorul
     ~Pacient(){
@@ -610,23 +612,21 @@ public:
         this->sectie = sectie;
     }
 
-    void setNrMediciCareFolosescAparatul(int nrMediciCareFolosescAparatul)  {
-        this->nrMediciCareFolosescAparatul = nrMediciCareFolosescAparatul;
-    }
-
-    void setNumeMediciCareFolosescAparatul(string* numeMediciCareFolosescAparatul){
-        if (this->numeMediciCareFolosescAparatul != NULL)
-        {
-            delete[] this->numeMediciCareFolosescAparatul;
+    void setNumeMediciCareFolosescAparatul(string* numeMedici, int nrMedici) {
+        if(numeMediciCareFolosescAparatul != nullptr) {
+            delete[] numeMediciCareFolosescAparatul; // eliberez memoria alocata anterior
         }
-        this->numeMediciCareFolosescAparatul = new string[this->nrMediciCareFolosescAparatul];
-        for(int i=0; i<this->nrMediciCareFolosescAparatul;i++)
-            this->numeMediciCareFolosescAparatul[i] = numeMediciCareFolosescAparatul[i]; 
+
+        this->nrMediciCareFolosescAparatul = nrMedici;
+        this->numeMediciCareFolosescAparatul = new string[nrMedici];
+        for (int i = 0; i < nrMedici; ++i) {
+            this->numeMediciCareFolosescAparatul[i] = numeMedici[i]; // aloc noul vector
+        }
     }
 
     // destructorul
     ~Aparatura() {
-        if (numeMediciCareFolosescAparatul != NULL)
+        if (numeMediciCareFolosescAparatul != nullptr)
             delete[] numeMediciCareFolosescAparatul;
     }
 
@@ -818,8 +818,7 @@ public:
 
     // constructor cu 1 parametru
     PreparatFarmaceutic(string* ingredientePrincipale, int nrIngrediente):concentratie(0.1){
-        this->setNrIngrediente(nrIngrediente);
-        this->setIngredientePrincipale(ingredientePrincipale);
+        this->setIngredientePrincipale(ingredientePrincipale, nrIngrediente);
     }
 
     // functia de afisare
@@ -864,8 +863,7 @@ public:
 
     // constructorul cu 1 parametru
     PacientSpecial(string* afectiuni, int nrAfectiuni):boalaExtra("Coronavirus"){
-        this->setNrAfectiuni(nrAfectiuni);
-        this->setAfectiuni(afectiuni);
+        this->setAfectiuni(afectiuni, nrAfectiuni);
     }
 
     // afisare
@@ -1105,6 +1103,7 @@ void citireBinaraPacient()
 }
 
 int main() {
+/*
 // FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
 // pentru Medicament
  {
@@ -1151,37 +1150,28 @@ cout << "Diferenta de pret dintre "<< medicament2.getNume() <<" si "<< medicamen
 bool acelasiNrIngrediente = medicament4 == medicament2; // apelul operatorului ==
 cout << "Au acelasi numar de ingrediente "<< medicament2.getNume() <<" si "<< medicament3.getNume() <<"? "<< acelasiNrIngrediente << endl;
 
-// testarea getterilor si a setterilor in main
-cout << "Testarea getter Nume: " << medicament1.getNume() << endl;
-medicament1.setNume("Nurofen");
-cout << "Testarea daca setter pretCutie a functionat: " << medicament1.getNume() << endl;
 
-cout << "Testarea getter Nume: " << medicament1.getPretCutie() << endl;
+// testarea getterilor si a setterilor in main
+medicament1.setNume("Nurofen");
+cout << "Testarea daca setter Nume a functionat folosind un getter: " << medicament1.getNume() << endl;
+
 medicament1.setPretCutie(13);
-cout << "Testarea daca setter pretCutie a functionat: " << medicament1.getPretCutie() << endl;
+cout << "Testarea daca setter pretCutie a functionat folosind un getter: " << medicament1.getPretCutie() << endl;
 
 cout << "Testarea getter id: " << medicament1.getId() << endl;
 cout << "Testarea getter contor: " << medicament2.getContor() << endl;
 
-cout << "Testarea getter nrIngrediente: " << medicament1.getNrIngrediente() << endl;
-cout << "Testarea getter ingredientePrincipale: ";
-string* ingredienteInitiale = medicament1.getIngredientePrincipale();
-for (int i = 0; i < medicament1.getNrIngrediente(); ++i) {
-        cout << ingredienteInitiale[i] << ", ";
+string ingredienteNoi[] = {"Celuloza", "Lactoza"};
+medicament1.setIngredientePrincipale(ingredienteNoi, 2);
+cout << "Testarea daca setter nrIngrediente a funcitonat folosind getter: " << medicament1.getNrIngrediente() << endl;
+cout << "Testarea daca setter ingredientePrincipale a functionat folosind getter:\n";
+string* ingredienteG = medicament1.getIngredientePrincipale();
+for (int i = 0; i < medicament1.getNrIngrediente(); i++) {
+        cout << ingredienteG[i] << endl;
     }
 cout << endl;
-medicament1.setNrIngrediente(2);
-cout << "Testarea daca setter nrIngrediente a functionat" << medicament1.getNrIngrediente() << endl;
-string ingredienteNoi[] = {"Celuloza", "Lactoza"};
-medicament1.setIngredientePrincipale(ingredienteNoi);
-cout << "Ingrediente actualizate: ";
-ingredienteInitiale = medicament1.getIngredientePrincipale();
-for (int i = 0; i < medicament1.getNrIngrediente(); ++i) {
-    cout << ingredienteInitiale[i] << ", ";
-}
-cout << endl;
 
-cout<<endl;
+cout << endl;
 }
 
 // Pentru Pacient
@@ -1200,7 +1190,6 @@ pacient2.afisare();
 cout<<"\n";
 pacient3.afisare();
 cout<<"\n";
-
 
 // supraincarcarilor operatorilor 
 Pacient pacient4("Elena Popa", 25);
@@ -1221,7 +1210,30 @@ cout << "Diferenta de varsta intre " << pacient4.getNume() << " si " << pacient1
 bool aceeasiVarsta = pacient1 == pacient3;
 cout << pacient1.getNume() << " si " << pacient3.getNume() << " au aceeasi varsta? " << (aceeasiVarsta ? "Da" : "Nu") << endl;
 
-cout<<endl;
+// testarea getterilor si a setterilor in main
+pacient2.setNume("Dana Popescu");
+cout << "Testarea setter Nume folosind un getter: " << pacient2.getNume() << endl;
+
+pacient2.setVarsta(54);
+cout << "Testarea daca setter Varsta a functionat folosind un getter: " << pacient2.getVarsta() << endl;
+
+pacient2.setNrTelefon("07547384");
+cout << "Testarea daca setter nrTelefon a functionat folosind un getter: " << pacient2.getNrTelefon() << endl;
+
+cout << "Testarea getter id: " << pacient2.getCNP() << endl;
+cout << "Testarea getter contor: " << pacient2.getContorFisePacienti() << endl;
+
+string afectiuni[] = {"Reumatism", "Hipotensiune arteriala"};
+pacient2.setAfectiuni(afectiuni, 2);
+cout << "Testare setter nrAfectiuni folosind getter: " << pacient2.getNrAfectiuni() << endl;
+cout << "Testare setter afectiuni folosind getter:\n";
+string* afectiuniG = pacient2.getAfectiuni();
+for (int i = 0; i < pacient2.getNrAfectiuni(); i++) {
+    cout << afectiuniG[i] << endl;
+}
+cout << endl;
+
+cout << endl;
 }
 
 // Pentru Aparatura Medicala
@@ -1260,9 +1272,31 @@ cout << "Diferenta de pret intre " << aparat3.getDenumire() << " si " << aparat2
 bool acelasiPret = aparat4 == aparat1;
 cout << aparat4.getDenumire() << " si " << aparat1.getDenumire() << " au acelasi pret? " << (acelasiPret ? "Da" : "Nu") << endl;
 
-cout<<endl;
-}
+// testarea getterilor si a setterilor in main
+aparat3.setDenumire("Bronhoscop");
+cout << "Testarea setter Denumire folosind un getter: " << aparat3.getDenumire() << endl;
 
+aparat3.setPret(5400);
+cout << "Testarea daca setter Pret a functionat folosind un getter: " << aparat3.getPret() << endl;
+
+aparat3.setSectie("Pneumologie");
+cout << "Testarea daca setter Sectie a functionat folosind un getter: " << aparat3.getSectie() << endl;
+
+cout << "Testarea getter TVA: " << aparat3.getTVA() << endl;
+cout << "Testarea getter marca: " << aparat3.getMarca() << endl;
+
+string mediciNume[] = {"Dr. Marian Popa", "Dr. Alisa Marcu", "Dr. Maria Ionescu"};
+aparat3.setNumeMediciCareFolosescAparatul(mediciNume, 3);
+cout << "Testare setter nrMedici folosind getter: " << aparat3.getNrMediciCareFolosescAparatul() << endl;
+cout << "Testare setter numeMedici folosind getter:\n";
+string* mediciG = aparat3.getNumeMediciCareFolosescAparatul();
+for (int i = 0; i < aparat3.getNrMediciCareFolosescAparatul(); i++) {
+    cout << mediciG[i] << endl;
+}
+cout << endl;
+cout << endl;
+}
+*/
 
 // FAZA 4: 3 vectori in main de tipul celor 3 clase de baza - Medicament, Pacient, Aparatura
 // declarari de dimensiuni + vectori in sine
@@ -1318,6 +1352,7 @@ Aparatura vectorAparate[nrApar];
         cout << endl;
     }
 
+    /*
     // FAZA 5: clasa Reteta ce se afla in relatie de has-a cu clasele initiale Medicament si Pacient
     Reteta reteta;
     cin >> reteta;
@@ -1425,4 +1460,5 @@ Aparatura vectorAparate[nrApar];
     
     for(int i=0; i<10; i++)
         pointeri2[i]->istoricAfectiuni();
+    */
 }
