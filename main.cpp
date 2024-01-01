@@ -78,7 +78,7 @@ public:
     friend void modificaPretMedicament(Medicament& medicament, float pretNou);
 
     // constructor implicit
-    Medicament(): id(0){
+    Medicament(): id(contor){
         this->nume = "Paracetamol";
         this->pretCutie = 10;
         this->nrIngrediente = 3;
@@ -218,19 +218,31 @@ public:
 
     // >> pentru citire
     friend istream& operator>>(istream& input, Medicament& medicament) {
-    cout << "Introduceti numele medicamentului: ";
-    getline(input, medicament.nume);
-    cout << "Introduceti pretul cutiei: ";
-    input >> medicament.pretCutie;
-    cout << "Introduceti numarul de ingrediente principale: ";
-    input >> medicament.nrIngrediente;
-    medicament.ingredientePrincipale = new string[medicament.nrIngrediente];
-    cout << "Introduceti ingredientele principale:\n";
-    for (int i = 0; i < medicament.nrIngrediente; ++i) {
-        getline(input, medicament.ingredientePrincipale[i]);
+        cout << "Introduceti numele medicamentului: ";
+        input.ignore();
+        getline(input, medicament.nume);
+
+        cout << "Introduceti pretul cutiei: ";
+        input >> medicament.pretCutie;
+        input.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        cout << "Introduceti numarul de ingrediente principale: ";
+        input >> medicament.nrIngrediente;
+        input.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        delete[] medicament.ingredientePrincipale;
+        medicament.ingredientePrincipale = new string[medicament.nrIngrediente];
+
+        cout << "Introduceti ingredientele principale:\n";
+        input.ignore(); 
+
+        for (int i = 0; i < medicament.nrIngrediente; ++i) {
+            getline(input, medicament.ingredientePrincipale[i]);
+        }
+
+        return input;
     }
-    return input;
-    }
+
 
     // << pentru afisare
     friend ostream& operator<<(ostream& output, const Medicament& medicament) {
@@ -410,7 +422,6 @@ public:
     }
 }
 
-
     // destructorul
     ~Pacient(){
         if (afectiuni != NULL)
@@ -449,17 +460,22 @@ public:
     }
 
     // >> pentru citire
-    friend istream& operator>>(istream& input, Pacient& pacient) {
+   friend istream& operator>>(istream& input, Pacient& pacient) {
         cout << "Introduceti numele pacientului: ";
-        input >> pacient.nume;
-        cout << "Introduceti varsta pacientului: ";
+        getline(input, pacient.nume);
+        cout << "Introduceti varsta: ";
         input >> pacient.varsta;
+        input.ignore(); 
+        cout << "Introduceti numarul de telefon: ";
+        getline(input, pacient.nrTelefon);
         cout << "Introduceti numarul de afectiuni: ";
         input >> pacient.nrAfectiuni;
+        input.ignore(); 
+        delete[] pacient.afectiuni;
         pacient.afectiuni = new string[pacient.nrAfectiuni];
-        cout << "Introduceti afectiunile pacientului:\n";
+        cout << "Introduceti afectiunile:\n";
         for (int i = 0; i < pacient.nrAfectiuni; ++i) {
-            input >> pacient.afectiuni[i];
+        getline(input, pacient.afectiuni[i]);
         }
         return input;
     }
@@ -661,22 +677,28 @@ public:
     }
 
     // >> pentru citire
-    friend istream& operator>>(istream& input, Aparatura& aparat) {
-    cout << "Introduceti denumirea aparatului: ";
-    input >> aparat.denumire;
-    cout << "Introduceti pretul aparatului: ";
-    input >> aparat.pret;
-    cout << "Introduceti sectia aparatului: ";
-    input >> aparat.sectie;
-    cout << "Introduceti numarul de medici care folosesc aparatul: ";
-    input >> aparat.nrMediciCareFolosescAparatul;
-    aparat.numeMediciCareFolosescAparatul = new string[aparat.nrMediciCareFolosescAparatul];
-    cout << "Introduceti numele medicilor care folosesc aparatul:\n";
-    for (int i = 0; i < aparat.nrMediciCareFolosescAparatul; ++i) {
-        input >> aparat.numeMediciCareFolosescAparatul[i];
+    friend istream& operator>>(istream& input, Aparatura& aparatura) {
+        cout << "Introduceti denumirea: ";
+        getline(input, aparatura.denumire);
+        cout << "Introduceti pretul: ";
+        input >> aparatura.pret;
+        input.ignore(); 
+        cout << "Introduceti sectia: ";
+        getline(input, aparatura.sectie);
+        cout << "Introduceti numarul de medici care folosesc aparatul: ";
+        input >> aparatura.nrMediciCareFolosescAparatul;
+        input.ignore(); 
+
+        delete[] aparatura.numeMediciCareFolosescAparatul;
+        aparatura.numeMediciCareFolosescAparatul = new string[aparatura.nrMediciCareFolosescAparatul];
+        
+        cout << "Introduceti numele medicilor care folosesc aparatul:\n";
+        for (int i = 0; i < aparatura.nrMediciCareFolosescAparatul; ++i) {
+            cout << "Medic " << i + 1 << ": ";
+            getline(input, aparatura.numeMediciCareFolosescAparatul[i]);
+        }
+        return input;
     }
-    return input;
-}
 
     // << pentru afisare
     friend ostream& operator<<(ostream& output, const Aparatura& aparat) {
@@ -883,11 +905,8 @@ public:
 
     // supraincarcarea operatorului >> pentru citire
     friend istream& operator>>(istream& input, PacientSpecial& pacient) {
-        // folosesc op >> de citire din clasa de baza Pacient
-        input >> static_cast<Pacient&>(pacient);
-        
-        // citesc atributul in plus al PacientSpecial
-        cout << "Boala speciala a pacientului: ";
+        input >> static_cast<Pacient&>(pacient); // folosesc op >> de citire din clasa de baza Pacient
+        cout << "Boala speciala a pacientului: "; // citesc atributul in plus al PacientSpecial
         input >> pacient.boalaExtra;
         
         return input;
@@ -1102,217 +1121,216 @@ void citireBinaraPacient()
     }
 }
 
+
 int main() {
-/*
-// FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
-// pentru Medicament
- {
-// creez obiectele de tip Medicament cu constructorii
-Medicament medicament1; // constructor implicit
-string ingrediente2[] = { "Ibuprofen", "Croscarmeloză sodică", "Celuloză microcristalină", "Amidon de porumb pregelatinizat" };
-Medicament medicament2("Nurofen", 15.0, 4, ingrediente2); // constructor cu 4 parametri
-string ingrediente3[] = {"Desloratadină", "Amidon pregelatinizat", "Stereat de magneziu"};
-Medicament medicament3("Aerius", 20.0, ingrediente3); // constructor cu 3 parametri
+    // FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
+    // pentru Medicament
+    {
+    // creez obiectele de tip Medicament cu constructorii
+    Medicament medicament1; // constructor implicit
+    string ingrediente2[] = { "Ibuprofen", "Croscarmeloză sodică", "Celuloză microcristalină", "Amidon de porumb pregelatinizat" };
+    Medicament medicament2("Nurofen", 15.0, 4, ingrediente2); // constructor cu 4 parametri
+    string ingrediente3[] = {"Desloratadină", "Amidon pregelatinizat", "Stereat de magneziu"};
+    Medicament medicament3("Aerius", 20.0, ingrediente3); // constructor cu 3 parametri
 
-// afisez cele 3 obiecte de tip Medicament
-modificaPretMedicament(medicament1, 12.5);
-medicament1.afisare();
-cout<<"\n";
-medicament2.afisare();
-cout<<"\n";
-medicament3.afisare();
-cout<<"\n";
+    // afisez cele 3 obiecte de tip Medicament
+    modificaPretMedicament(medicament1, 12.5);
+    medicament1.afisare();
+    cout<<"\n";
+    medicament2.afisare();
+    cout<<"\n";
+    medicament3.afisare();
+    cout<<"\n";
 
-// calcularea dozei recomandate pentru un exemplu - functie
-double greutatePacient = 52; // Greutatea pacientului în kg
-double concentratieMedicament3 = 0.5; // Concentrația medicamentului 3
+    // calcularea dozei recomandate pentru un exemplu - functie
+    double greutatePacient = 52; // Greutatea pacientului în kg
+    double concentratieMedicament3 = 0.5; // Concentrația medicamentului 3
 
-double dozaRecomandata = Medicament::calculareDozaRecomandata(greutatePacient, concentratieMedicament3);
-cout << "Doza recomandata de " << medicament3.getNume() << " pentru un pacient cu greutatea de " << greutatePacient << " kg si o concentratie de " << concentratieMedicament3 << " este " << dozaRecomandata << " grame.\n\n";
-    
+    double dozaRecomandata = Medicament::calculareDozaRecomandata(greutatePacient, concentratieMedicament3);
+    cout << "Doza recomandata de " << medicament3.getNume() << " pentru un pacient cu greutatea de " << greutatePacient << " kg si o concentratie de " << concentratieMedicament3 << " este " << dozaRecomandata << " grame.\n\n";
+        
 
-// supraincarcarilor operatorilor 
-Medicament medicament4("Ibuprofen", 10.0, 0, NULL); 
-// operatorul = folosit pentru copiere
-medicament4 = medicament2; 
-medicament4.afisare();
-cout<<endl;
+    // supraincarcarilor operatorilor 
+    Medicament medicament4("Ibuprofen", 10.0, 0, NULL); 
+    // operatorul = folosit pentru copiere
+    medicament4 = medicament2; 
+    medicament4.afisare();
+    cout<<endl;
 
-// operatorul + folosit pentru a afla suma preturilor a 2 medicamente
-float sumaPret = medicament4 + medicament2; 
-cout << "Costul total pentru "<< medicament2.getNume() <<" si "<< medicament4.getNume() << " este: " << sumaPret << endl;
+    // operatorul + folosit pentru a afla suma preturilor a 2 medicamente
+    float sumaPret = medicament4 + medicament2; 
+    cout << "Costul total pentru "<< medicament2.getNume() <<" si "<< medicament4.getNume() << " este: " << sumaPret << endl;
 
-// operatorul - folosit pentru a afla diferenta de pret intre 2 medicamente
-float diferentaPret = medicament2 - medicament4; 
-cout << "Diferenta de pret dintre "<< medicament2.getNume() <<" si "<< medicament4.getNume() << " este: " << diferentaPret << endl;
+    // operatorul - folosit pentru a afla diferenta de pret intre 2 medicamente
+    float diferentaPret = medicament2 - medicament4; 
+    cout << "Diferenta de pret dintre "<< medicament2.getNume() <<" si "<< medicament4.getNume() << " este: " << diferentaPret << endl;
 
-// operatorul == folosit pentru a vedea daca 2 medicamente au acelasi numar de ingrediente
-bool acelasiNrIngrediente = medicament4 == medicament2; // apelul operatorului ==
-cout << "Au acelasi numar de ingrediente "<< medicament2.getNume() <<" si "<< medicament3.getNume() <<"? "<< acelasiNrIngrediente << endl;
+    // operatorul == folosit pentru a vedea daca 2 medicamente au acelasi numar de ingrediente
+    bool acelasiNrIngrediente = medicament4 == medicament2; // apelul operatorului ==
+    cout << "Au acelasi numar de ingrediente "<< medicament2.getNume() <<" si "<< medicament3.getNume() <<"? "<< acelasiNrIngrediente << endl;
 
 
-// testarea getterilor si a setterilor in main
-medicament1.setNume("Nurofen");
-cout << "Testarea daca setter Nume a functionat folosind un getter: " << medicament1.getNume() << endl;
+    // testarea getterilor si a setterilor in main
+    medicament1.setNume("Nurofen");
+    cout << "Testarea daca setter Nume a functionat folosind un getter: " << medicament1.getNume() << endl;
 
-medicament1.setPretCutie(13);
-cout << "Testarea daca setter pretCutie a functionat folosind un getter: " << medicament1.getPretCutie() << endl;
+    medicament1.setPretCutie(13);
+    cout << "Testarea daca setter pretCutie a functionat folosind un getter: " << medicament1.getPretCutie() << endl;
 
-cout << "Testarea getter id: " << medicament1.getId() << endl;
-cout << "Testarea getter contor: " << medicament2.getContor() << endl;
+    cout << "Testarea getter id: " << medicament1.getId() << endl;
+    cout << "Testarea getter contor: " << medicament2.getContor() << endl;
 
-string ingredienteNoi[] = {"Celuloza", "Lactoza"};
-medicament1.setIngredientePrincipale(ingredienteNoi, 2);
-cout << "Testarea daca setter nrIngrediente a funcitonat folosind getter: " << medicament1.getNrIngrediente() << endl;
-cout << "Testarea daca setter ingredientePrincipale a functionat folosind getter:\n";
-string* ingredienteG = medicament1.getIngredientePrincipale();
-for (int i = 0; i < medicament1.getNrIngrediente(); i++) {
-        cout << ingredienteG[i] << endl;
+    string ingredienteNoi[] = {"Celuloza", "Lactoza"};
+    medicament1.setIngredientePrincipale(ingredienteNoi, 2);
+    cout << "Testarea daca setter nrIngrediente a funcitonat folosind getter: " << medicament1.getNrIngrediente() << endl;
+    cout << "Testarea daca setter ingredientePrincipale a functionat folosind getter:\n";
+    string* ingredienteG = medicament1.getIngredientePrincipale();
+    for (int i = 0; i < medicament1.getNrIngrediente(); i++) {
+            cout << ingredienteG[i] << endl;
+        }
+    cout << endl;
+
+    cout << endl;
     }
-cout << endl;
 
-cout << endl;
-}
+    // Pentru Pacient
+    {
+    // creez obiectele de tip Pacient cu constructorii
+    Pacient pacient1;
+    Pacient pacient2("Maria Ionescu", 30);
+    Pacient pacient3("Teodor Marinescu");
 
-// Pentru Pacient
-{
-// creez obiectele de tip Pacient cu constructorii
-Pacient pacient1;
-Pacient pacient2("Maria Ionescu", 30);
-Pacient pacient3("Teodor Marinescu");
+    cout<<"Numarul total de pacienti pana acum este "<<Pacient::GetTotalPacienti()<<".\n";
 
-cout<<"Numarul total de pacienti pana acum este "<<Pacient::GetTotalPacienti()<<".\n";
+    // afisez cele 3 obiecte de tip Pacient
+    pacient1.afisare();
+    cout<<"\n";
+    pacient2.afisare();
+    cout<<"\n";
+    pacient3.afisare();
+    cout<<"\n";
 
-// afisez cele 3 obiecte de tip Pacient
-pacient1.afisare();
-cout<<"\n";
-pacient2.afisare();
-cout<<"\n";
-pacient3.afisare();
-cout<<"\n";
+    // supraincarcarilor operatorilor 
+    Pacient pacient4("Elena Popa", 25);
+    // operatorul = folosit pentru atribuirea bolilor lui pacient2 lui pacient4
+    pacient4 = pacient2; 
+    pacient4.afisare();
+    cout<< endl;
 
-// supraincarcarilor operatorilor 
-Pacient pacient4("Elena Popa", 25);
-// operatorul = folosit pentru atribuirea bolilor lui pacient2 lui pacient4
-pacient4 = pacient2; 
-pacient4.afisare();
-cout<< endl;
+    // operatorul + folosit pentru aflarea nr total de afectiuni a 2 pacienti
+    int sumaAfectiuni = pacient1 + pacient3;
+    cout << "Suma numarului de afectiuni ale lui " << pacient4.getNume() << " si " << pacient3.getNume() << " este " << sumaAfectiuni << endl;
 
-// operatorul + folosit pentru aflarea nr total de afectiuni a 2 pacienti
-int sumaAfectiuni = pacient1 + pacient3;
-cout << "Suma numarului de afectiuni ale lui " << pacient4.getNume() << " si " << pacient3.getNume() << " este " << sumaAfectiuni << endl;
+    // operatorul - folosit pentru aflarea diferentei de varsta dintre 2 pacienti
+    int diferentaVarsta = pacient4 - pacient1;
+    cout << "Diferenta de varsta intre " << pacient4.getNume() << " si " << pacient1.getNume() << " este " << diferentaVarsta << " ani" << endl;
 
-// operatorul - folosit pentru aflarea diferentei de varsta dintre 2 pacienti
-int diferentaVarsta = pacient4 - pacient1;
-cout << "Diferenta de varsta intre " << pacient4.getNume() << " si " << pacient1.getNume() << " este " << diferentaVarsta << " ani" << endl;
+    // operatorul == folosit pentru a afla daca 2 pacienti au aceeasi varsta
+    bool aceeasiVarsta = pacient1 == pacient3;
+    cout << pacient1.getNume() << " si " << pacient3.getNume() << " au aceeasi varsta? " << (aceeasiVarsta ? "Da" : "Nu") << endl;
 
-// operatorul == folosit pentru a afla daca 2 pacienti au aceeasi varsta
-bool aceeasiVarsta = pacient1 == pacient3;
-cout << pacient1.getNume() << " si " << pacient3.getNume() << " au aceeasi varsta? " << (aceeasiVarsta ? "Da" : "Nu") << endl;
+    // testarea getterilor si a setterilor in main
+    pacient2.setNume("Dana Popescu");
+    cout << "Testarea setter Nume folosind un getter: " << pacient2.getNume() << endl;
 
-// testarea getterilor si a setterilor in main
-pacient2.setNume("Dana Popescu");
-cout << "Testarea setter Nume folosind un getter: " << pacient2.getNume() << endl;
+    pacient2.setVarsta(54);
+    cout << "Testarea daca setter Varsta a functionat folosind un getter: " << pacient2.getVarsta() << endl;
 
-pacient2.setVarsta(54);
-cout << "Testarea daca setter Varsta a functionat folosind un getter: " << pacient2.getVarsta() << endl;
+    pacient2.setNrTelefon("07547384");
+    cout << "Testarea daca setter nrTelefon a functionat folosind un getter: " << pacient2.getNrTelefon() << endl;
 
-pacient2.setNrTelefon("07547384");
-cout << "Testarea daca setter nrTelefon a functionat folosind un getter: " << pacient2.getNrTelefon() << endl;
+    cout << "Testarea getter id: " << pacient2.getCNP() << endl;
+    cout << "Testarea getter contor: " << pacient2.getContorFisePacienti() << endl;
 
-cout << "Testarea getter id: " << pacient2.getCNP() << endl;
-cout << "Testarea getter contor: " << pacient2.getContorFisePacienti() << endl;
+    string afectiuni[] = {"Reumatism", "Hipotensiune arteriala"};
+    pacient2.setAfectiuni(afectiuni, 2);
+    cout << "Testare setter nrAfectiuni folosind getter: " << pacient2.getNrAfectiuni() << endl;
+    cout << "Testare setter afectiuni folosind getter:\n";
+    string* afectiuniG = pacient2.getAfectiuni();
+    for (int i = 0; i < pacient2.getNrAfectiuni(); i++) {
+        cout << afectiuniG[i] << endl;
+    }
+    cout << endl;
 
-string afectiuni[] = {"Reumatism", "Hipotensiune arteriala"};
-pacient2.setAfectiuni(afectiuni, 2);
-cout << "Testare setter nrAfectiuni folosind getter: " << pacient2.getNrAfectiuni() << endl;
-cout << "Testare setter afectiuni folosind getter:\n";
-string* afectiuniG = pacient2.getAfectiuni();
-for (int i = 0; i < pacient2.getNrAfectiuni(); i++) {
-    cout << afectiuniG[i] << endl;
-}
-cout << endl;
+    cout << endl;
+    }
 
-cout << endl;
-}
+    // Pentru Aparatura Medicala
+    {
+    // creez obiectele de tip Aparatura cu constructorii
+    Aparatura aparat1;
+    Aparatura aparat2("Autorefractor");
+    Aparatura aparat3("Computer Tomograf", 41000);
 
-// Pentru Aparatura Medicala
-{
-// creez obiectele de tip Aparatura cu constructorii
-Aparatura aparat1;
-Aparatura aparat2("Autorefractor");
-Aparatura aparat3("Computer Tomograf", 41000);
-
-// afisez cele 3 obiecte de tip Aparatura
-afisareAparatura(aparat1);
-cout<<"\n";
-afisareAparatura(aparat2);
-cout<<"\n";
-Aparatura::setTVA(0.21); // aici am folosit functia statica, crescand TVA-ul
-afisareAparatura(aparat3);
-cout<<"\n";
+    // afisez cele 3 obiecte de tip Aparatura
+    afisareAparatura(aparat1);
+    cout<<"\n";
+    afisareAparatura(aparat2);
+    cout<<"\n";
+    Aparatura::setTVA(0.21); // aici am folosit functia statica, crescand TVA-ul
+    afisareAparatura(aparat3);
+    cout<<"\n";
 
 
-// supraincarcarilor operatorilor 
-// operatorul = folosit pentru atribuirea medicilor care folosesc aparat3 lui aparat4
-Aparatura aparat4("Fluoroscop");
-aparat4 = aparat3;
-afisareAparatura(aparat4);
-cout<<endl; 
+    // supraincarcarilor operatorilor 
+    // operatorul = folosit pentru atribuirea medicilor care folosesc aparat3 lui aparat4
+    Aparatura aparat4("Fluoroscop");
+    aparat4 = aparat3;
+    afisareAparatura(aparat4);
+    cout<<endl; 
 
-// operatorul + folosit pentru a afla costul total pentru achizitia a 2 aparate
-float sumaPreturi = aparat1 + aparat2;
-cout << "Costul total pentru achizita a aparatelor " << aparat1.getDenumire() << " si " << aparat2.getDenumire() << " este " << sumaPreturi << endl;
+    // operatorul + folosit pentru a afla costul total pentru achizitia a 2 aparate
+    float sumaPreturi = aparat1 + aparat2;
+    cout << "Costul total pentru achizita a aparatelor " << aparat1.getDenumire() << " si " << aparat2.getDenumire() << " este " << sumaPreturi << endl;
 
-// operatorul - folosit pentru a afla diferenta de pret intre 2 aparate
-float diferentaPret = aparat3 - aparat2;
-cout << "Diferenta de pret intre " << aparat3.getDenumire() << " si " << aparat2.getDenumire() << " este " << diferentaPret << endl;
+    // operatorul - folosit pentru a afla diferenta de pret intre 2 aparate
+    float diferentaPret = aparat3 - aparat2;
+    cout << "Diferenta de pret intre " << aparat3.getDenumire() << " si " << aparat2.getDenumire() << " este " << diferentaPret << endl;
 
-// operatorul == folosit pentru a vedea daca 2 aparate au acelasi pret
-bool acelasiPret = aparat4 == aparat1;
-cout << aparat4.getDenumire() << " si " << aparat1.getDenumire() << " au acelasi pret? " << (acelasiPret ? "Da" : "Nu") << endl;
+    // operatorul == folosit pentru a vedea daca 2 aparate au acelasi pret
+    bool acelasiPret = aparat4 == aparat1;
+    cout << aparat4.getDenumire() << " si " << aparat1.getDenumire() << " au acelasi pret? " << (acelasiPret ? "Da" : "Nu") << endl;
 
-// testarea getterilor si a setterilor in main
-aparat3.setDenumire("Bronhoscop");
-cout << "Testarea setter Denumire folosind un getter: " << aparat3.getDenumire() << endl;
+    // testarea getterilor si a setterilor in main
+    aparat3.setDenumire("Bronhoscop");
+    cout << "Testarea setter Denumire folosind un getter: " << aparat3.getDenumire() << endl;
 
-aparat3.setPret(5400);
-cout << "Testarea daca setter Pret a functionat folosind un getter: " << aparat3.getPret() << endl;
+    aparat3.setPret(5400);
+    cout << "Testarea daca setter Pret a functionat folosind un getter: " << aparat3.getPret() << endl;
 
-aparat3.setSectie("Pneumologie");
-cout << "Testarea daca setter Sectie a functionat folosind un getter: " << aparat3.getSectie() << endl;
+    aparat3.setSectie("Pneumologie");
+    cout << "Testarea daca setter Sectie a functionat folosind un getter: " << aparat3.getSectie() << endl;
 
-cout << "Testarea getter TVA: " << aparat3.getTVA() << endl;
-cout << "Testarea getter marca: " << aparat3.getMarca() << endl;
+    cout << "Testarea getter TVA: " << aparat3.getTVA() << endl;
+    cout << "Testarea getter marca: " << aparat3.getMarca() << endl;
 
-string mediciNume[] = {"Dr. Marian Popa", "Dr. Alisa Marcu", "Dr. Maria Ionescu"};
-aparat3.setNumeMediciCareFolosescAparatul(mediciNume, 3);
-cout << "Testare setter nrMedici folosind getter: " << aparat3.getNrMediciCareFolosescAparatul() << endl;
-cout << "Testare setter numeMedici folosind getter:\n";
-string* mediciG = aparat3.getNumeMediciCareFolosescAparatul();
-for (int i = 0; i < aparat3.getNrMediciCareFolosescAparatul(); i++) {
-    cout << mediciG[i] << endl;
-}
-cout << endl;
-cout << endl;
-}
-*/
+    string mediciNume[] = {"Dr. Marian Popa", "Dr. Alisa Marcu", "Dr. Maria Ionescu"};
+    aparat3.setNumeMediciCareFolosescAparatul(mediciNume, 3);
+    cout << "Testare setter nrMedici folosind getter: " << aparat3.getNrMediciCareFolosescAparatul() << endl;
+    cout << "Testare setter numeMedici folosind getter:\n";
+    string* mediciG = aparat3.getNumeMediciCareFolosescAparatul();
+    for (int i = 0; i < aparat3.getNrMediciCareFolosescAparatul(); i++) {
+        cout << mediciG[i] << endl;
+    }
+    cout << endl;
+    cout << endl;
+    }
 
-// FAZA 4: 3 vectori in main de tipul celor 3 clase de baza - Medicament, Pacient, Aparatura
-// declarari de dimensiuni + vectori in sine
-int nrMed, nrPac, nrApar;
-cout<<"Dimensiunea vectorului de medicamente: ";
-cin>>nrMed;
-cout<<"Dimensiunea vectorului de pacienti: ";
-cin>>nrPac;
-cout<<"Dimensiunea vectorului de aparate medicale: ";
-cin>>nrApar;
-Medicament vectorMedicamente[nrMed];
-Pacient vectorPacienti[nrPac];
-Aparatura vectorAparate[nrApar];
+    // FAZA 4: 3 vectori in main de tipul celor 3 clase de baza - Medicament, Pacient, Aparatura
+    // declarari de dimensiuni + vectori in sine
+    int nrMed, nrPac, nrApar;
+    cout<<"Dimensiunea vectorului de medicamente: ";
+    cin>>nrMed;
+    cout<<"Dimensiunea vectorului de pacienti: ";
+    cin>>nrPac;
+    cout<<"Dimensiunea vectorului de aparate medicale: ";
+    cin>>nrApar;
+    Medicament vectorMedicamente[nrMed];
+    Pacient vectorPacienti[nrPac];
+    Aparatura vectorAparate[nrApar];
 
-// citirea vectorilor de la tastatură
-    cout << "Introduceti date pentru vectorul de medicamente:\n";
+    // citirea vectorilor de la tastatură
+   cout << "Introduceti date pentru vectorul de medicamente:\n";
     for (int i = 0; i < nrMed; ++i) {
         cout << "Medicament " << i + 1 << ":\n";
         cin >> vectorMedicamente[i];
@@ -1330,7 +1348,7 @@ Aparatura vectorAparate[nrApar];
         cin >> vectorAparate[i];
     }
 
-// afisarea vectorilor
+    // afisarea vectorilor
     cout << "\nAfisare vector de medicamente:\n";
     for (int i = 0; i < nrMed; ++i) {
         cout << "Medicament " << i + 1 << ":\n";
@@ -1352,12 +1370,27 @@ Aparatura vectorAparate[nrApar];
         cout << endl;
     }
 
-    /*
     // FAZA 5: clasa Reteta ce se afla in relatie de has-a cu clasele initiale Medicament si Pacient
     Reteta reteta;
-    cin >> reteta;
-    cout << reteta;
+    // testarea supraincarcarii operatorilor
+    cin >> reteta; // testarea supraincarcarii operatorului de citire >>
+    cout << reteta; // testarea supraincarcarii operatoruluide afisare<<
+    Reteta retetaC = reteta; // testarea supraincarcii operatorului de atribuire =
 
+    // testarea getterilor si a setterilor
+    Pacient pacientR;
+    reteta.setBeneficiar(pacientR);
+    cout << "Beneficiar: " << reteta.getBeneficiar().getNume() << endl;
+
+    reteta.setDecontataIntegral(true);
+    cout << "Decontata integral: " << reteta.getDecontataIntegral() << endl;
+
+    reteta.setDoctorCurant("Dr. Mario Ionescu");
+    cout << "Doctor curant: " << reteta.getDoctorCurant() << endl;
+
+    Medicament* medicamentR = new Medicament();
+    reteta.setMedicamentPrescris(medicamentR);
+    cout << "Medicament prescris: " << reteta.getMedicamentPrescris()->getNume() << endl;  
 
     // FAZA 6: citiri si afisari folosind fisiere text si binare
     // citirea si afisarea obiectelor Medicament si Pacient din și în fisier de tip text  
@@ -1378,7 +1411,6 @@ Aparatura vectorAparate[nrApar];
     afisareBinaraPacient();
     citireBinaraPacient();
 
-
    // FAZA 7: clasele aflate in relatie de is-a - PreparatFarmaceutic si PacientSpecial
    PreparatFarmaceutic preparat1;
    cin >> preparat1;
@@ -1389,7 +1421,6 @@ Aparatura vectorAparate[nrApar];
    cin >> pacientSpecial1;
    cout << "\nDetaliile pacientului special sunt:\n";
    pacientSpecial1.afisare();
-
 
   // FAZA 8: clase abstracte, functii virtuale, late binding
   // late binding pentru Farmacie
@@ -1460,5 +1491,4 @@ Aparatura vectorAparate[nrApar];
     
     for(int i=0; i<10; i++)
         pointeri2[i]->istoricAfectiuni();
-    */
 }
