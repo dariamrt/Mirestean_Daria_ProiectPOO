@@ -6,13 +6,14 @@
 #include <istream>
 using namespace std;
 
-/* Am incercat să structurez codul cât mai bine, folosind și comentarii. 
+/*
+Am incercat să structurez codul cât mai bine, folosind și comentarii.
 Totuși, am realizat și un README.md în care am oferit informații mai detaliate despre structura proiectului și funcționalități.
 */
 
-// două clase abstracte care să fie moștenite de către clasele pe care le am deja de la început
+// două clase abstracte care să fie mostenite de catre clasele pe care le am deja de la inceput - Spital și Farmacie
 // clasa abstracta Spital
-class Spital{
+class Spital {
 private:
     string nume;
     string adresa;
@@ -22,44 +23,43 @@ public:
     virtual void istoricAfectiuni() = 0; // afiseaza numele + ce afectiuni a avut pacientul de-a lungul timpului
     virtual void eFolosit() = 0; // afiseaza daca un aparat este sau nu folosit in spital
 
-     // constructor implicit
-    Spital(){
+    // constructor implicit
+    Spital() {
         this->nume = "Floreasca";
         this->adresa = "Sos. Stefan cel Mare, nr. 7";
     }
 
-    // destructor
-    virtual ~Spital(){
+    // destructor virtual
+    virtual ~Spital() {
     }
 };
 
 // clasa abstracta Farmacie
-class Farmacie{
+class Farmacie {
 private:
     string nume;
     string adresa;
-
 public:
     // functii virtuale
-    virtual int cateIngredienteContine() = 0;
-    virtual void eDecontataReteta() = 0;
-    
+    virtual int cateIngredienteContine() = 0; // ne afiseaza cate ingrediente contine un medicament
+    virtual void eDecontataReteta() = 0; // aflam daca o reteta este sau nu decontata
+
     // constructor implicit
-    Farmacie(){
-        this->nume="Dr Max";
-        this->adresa="Bd. Basarabilor, nr. 6";
+    Farmacie() {
+        this->nume = "Dr Max";
+        this->adresa = "Bd. Basarabilor, nr. 6";
     }
 
-    // destructor
-    virtual ~Farmacie(){
+    // destructor virtual
+    virtual ~Farmacie() {
     }
 };
 
-// cele 3 clase de la început - Medicament, Pacient, Aparatura
-class Medicament : public Farmacie{
+// cele 3 clase de la început - Medicament, Pacient, Aparatura - acestea fac parte din domeniul MeDical
+class Medicament : public Farmacie {
 private:
     string nume;
-    float pretCutie; 
+    float pretCutie;
     const int id; // atribut constant
     static int contor; // atribut static, contor al medicamentelor administrate per total
     int nrIngrediente;
@@ -67,18 +67,18 @@ private:
 
 public:
     // functii virtuale din clasa abstracta Farmacie
-    virtual int cateIngredienteContine(){
+    virtual int cateIngredienteContine() {
         return this->nrIngrediente;
     }
 
-    virtual void eDecontataReteta(){
+    virtual void eDecontataReteta() {
     }
 
     // declaratia de prietenie a functiei globale de modificare a pretului
     friend void modificaPretMedicament(Medicament& medicament, float pretNou);
 
     // constructor implicit
-    Medicament(): id(contor){
+    Medicament() : id(contor) {
         this->nume = "Paracetamol";
         this->pretCutie = 10;
         this->nrIngrediente = 3;
@@ -91,7 +91,7 @@ public:
 
     // constructor cu 4 parametri
     Medicament(string nume, float pretCutie, int nrIngrediente, string* ingrediente)
-    : nume(nume), pretCutie(pretCutie), id(contor), nrIngrediente(nrIngrediente) {
+        : nume(nume), pretCutie(pretCutie), id(contor), nrIngrediente(nrIngrediente) {
         this->ingredientePrincipale = new string[nrIngrediente];
         for (int i = 0; i < nrIngrediente; i++) {
             this->ingredientePrincipale[i] = ingrediente[i];
@@ -100,45 +100,45 @@ public:
     }
 
     // constructor cu 3 parametri
-    Medicament(string nume, float pretCutie, string* ingrediente): nume(nume), pretCutie(pretCutie), id(contor), nrIngrediente(3), ingredientePrincipale(nullptr) {
+    Medicament(string nume, float pretCutie, string* ingrediente) : nume(nume), pretCutie(pretCutie), id(contor), nrIngrediente(3), ingredientePrincipale(NULL) {
         ingredientePrincipale = new string[nrIngrediente];
         for (int i = 0; i < nrIngrediente; i++)
-            ingredientePrincipale[i] = ingrediente[i];
+            this->ingredientePrincipale[i] = ingrediente[i];
         this->contor++;
     }
 
     // functia membra de afisare
     void afisare() const {
-        cout << "Numele medicamentului: " << this->nume << "\nPret cutie: " << this->pretCutie << "\nID: " << this->id << "\nAcesta contine "<<this->nrIngrediente<<" ingrediente principale: ";
+        cout << "Numele medicamentului: " << this->nume << "\nPret cutie: " << this->pretCutie << "\nID: " << this->id << "\nAcesta contine " << this->nrIngrediente << " ingrediente principale: ";
         for (int i = 0; i < this->nrIngrediente - 1; i++)
             cout << this->ingredientePrincipale[i] << ", ";
         cout << this->ingredientePrincipale[nrIngrediente - 1] << ".\n";
     }
 
     // functia statica de calcul
-    static double calculareDozaRecomandata(double greutate, double concentratie){
+    static double calculareDozaRecomandata(double greutate, double concentratie) {
         return greutate * concentratie;
     }
 
-     // constructor de copiere
+    // constructor de copiere
     Medicament(const Medicament& medicament) : id(contor) {
-        nume = medicament.nume;
-        pretCutie = medicament.pretCutie;
-        nrIngrediente = medicament.nrIngrediente;
-        ingredientePrincipale = new string[nrIngrediente];
+        this->nume = medicament.nume;
+        this->pretCutie = medicament.pretCutie;
+        this->nrIngrediente = medicament.nrIngrediente;
+        this->ingredientePrincipale = new string[nrIngrediente];
         for (int i = 0; i < nrIngrediente; i++) {
-            ingredientePrincipale[i] = medicament.ingredientePrincipale[i];
+            this->ingredientePrincipale[i] = medicament.ingredientePrincipale[i];
         }
         contor++;
     }
 
     // metode de acces = getteri
     string getNume() const {
-        return nume;
+        return this->nume;
     }
 
     float getPretCutie() const {
-        return pretCutie;
+        return this->pretCutie;
     }
 
     int getId() const {
@@ -151,7 +151,7 @@ public:
 
     string* getIngredientePrincipale() const {
         return this->ingredientePrincipale;
-    }   
+    }
 
     static int getContor() {
         return contor;
@@ -167,27 +167,27 @@ public:
     }
 
     void setIngredientePrincipale(string* ingrediente, int nrIngrediente) {
-    if (ingredientePrincipale != nullptr) {
-        delete[] ingredientePrincipale; // eliberez memoria alocata anterior
-    }
-    
-    this->nrIngrediente = nrIngrediente;
-    this->ingredientePrincipale = new string[nrIngrediente];
-    for (int i = 0; i < nrIngrediente; ++i) {
-        this->ingredientePrincipale[i] = ingrediente[i]; // aloc noul vector
-    }
+        if (ingredientePrincipale != NULL) {
+            delete[] ingredientePrincipale; // eliberez memoria alocata anterior, in cazul in care este nevoie
+        }
+
+        this->nrIngrediente = nrIngrediente;
+        this->ingredientePrincipale = new string[nrIngrediente];
+        for (int i = 0; i < nrIngrediente; ++i) {
+            this->ingredientePrincipale[i] = ingrediente[i]; // aloc noul vector
+        }
     }
 
-    // destructorul 
-    ~Medicament(){
-        if (ingredientePrincipale != nullptr) {
+    // destructorul
+    ~Medicament() {
+        if (ingredientePrincipale != NULL) {
             delete[] ingredientePrincipale;
         }
     }
 
     // supraincarcarea operatorilor
     // = atribui ingredientele princiaple ale unui medicament altuia
-    Medicament& operator=(const Medicament& other) { 
+    Medicament& operator=(const Medicament& other) {
         this->nrIngrediente = other.nrIngrediente;
         delete[] ingredientePrincipale; // eliberez memoria alocată anterior pentru ingredientePrincipale
         this->ingredientePrincipale = new string[nrIngrediente];
@@ -219,24 +219,22 @@ public:
     // >> pentru citire
     friend istream& operator>>(istream& input, Medicament& medicament) {
         cout << "Introduceti numele medicamentului: ";
-        input.ignore();
+        input >> ws; // dau skip la leading white space(ex. spatii random, taburi, etc.)
         getline(input, medicament.nume);
 
         cout << "Introduceti pretul cutiei: ";
         input >> medicament.pretCutie;
-        input.ignore(numeric_limits<streamsize>::max(), '\n');
 
         cout << "Introduceti numarul de ingrediente principale: ";
         input >> medicament.nrIngrediente;
-        input.ignore(numeric_limits<streamsize>::max(), '\n');
 
-        delete[] medicament.ingredientePrincipale;
+            if (medicament.ingredientePrincipale != NULL) delete[] medicament.ingredientePrincipale;
+
         medicament.ingredientePrincipale = new string[medicament.nrIngrediente];
 
         cout << "Introduceti ingredientele principale:\n";
-        input.ignore(); 
-
         for (int i = 0; i < medicament.nrIngrediente; ++i) {
+            input >> ws;
             getline(input, medicament.ingredientePrincipale[i]);
         }
 
@@ -284,7 +282,7 @@ void modificaPretMedicament(Medicament& medicament, float pretNou) {
     medicament.setPretCutie(pretNou);
 }
 
-class Pacient : public Spital{
+class Pacient : public Spital {
 private:
     string nume;
     int varsta;
@@ -293,28 +291,27 @@ private:
     const long long int CNP;
     int nrAfectiuni;
     string* afectiuni;
-
-public: 
+public:
     // functii virtuale pentru clasa abstracta Spital
-    virtual void ePacientulMajor(){
-        if(this->varsta>=18)cout<<"Pacientul este major";
-        else cout<<"Pacientul este minor";
+    virtual void ePacientulMajor() {
+        if (this->varsta >= 18)cout << "Pacientul este major";
+        else cout << "Pacientul este minor";
     }
 
-    virtual void istoricAfectiuni(){
+    virtual void istoricAfectiuni() {
         cout << "Pacientul " << this->nume << " are urmatoarele " << this->nrAfectiuni << " afectiuni:\n";
-        for(int i=0;i<this->nrAfectiuni;i++)
-            cout<<this->afectiuni[i]<<endl;
+        for (int i = 0; i < this->nrAfectiuni; i++)
+            cout << this->afectiuni[i] << endl;
     }
 
-    virtual void eFolosit(){}
+    virtual void eFolosit() {}
 
     // constructor implicit
-    Pacient(): CNP(7394826157){
+    Pacient() : CNP(7394826157) {
         this->nume = "Ion Popescu";
-        this->varsta=21;
-        this->nrTelefon="0712345678";
-        this->nrAfectiuni=2;
+        this->varsta = 21;
+        this->nrTelefon = "0712345678";
+        this->nrAfectiuni = 2;
         afectiuni = new string[nrAfectiuni];
         afectiuni[0] = "Astm";
         afectiuni[1] = "Insuficienta cardiaca";
@@ -322,8 +319,8 @@ public:
     }
 
     // constructor cu 2 parametri
-    Pacient(string nume, int varsta): nume(nume), varsta(varsta), CNP(6848562849){
-        this->nrTelefon= "07987654434";
+    Pacient(string nume, int varsta) : nume(nume), varsta(varsta), CNP(6848562849) {
+        this->nrTelefon = "07987654434";
         this->nrAfectiuni = 1;
         afectiuni = new string[nrAfectiuni];
         afectiuni[0] = "Hernie de disc";
@@ -331,23 +328,23 @@ public:
     }
 
     // constructor cu 1 parametru
-    Pacient(string nume) : nume(nume), CNP(37585939576){
-        this->varsta=17;
-        this->nrTelefon="0712345678";
-        this->nrAfectiuni=3;
+    Pacient(string nume) : nume(nume), CNP(37585939576) {
+        this->varsta = 17;
+        this->nrTelefon = "0712345678";
+        this->nrAfectiuni = 3;
         afectiuni = new string[nrAfectiuni];
         afectiuni[0] = "Pneumonie";
         afectiuni[1] = "Astm";
         afectiuni[2] = "Hipotensiune";
         this->contorFisePacienti++;
     }
-    
+
     // functia de afisare
     void afisare() const {
         cout << "Pacient: " << this->nume << "\nVarsta: " << this->varsta << " ani\nCNP: " << this->CNP << "\nNr. telefon: " << this->nrTelefon << "\nAcesta sufera de " << this->nrAfectiuni << " afectiuni:\n";
         for (int i = 0; i < this->nrAfectiuni - 1; i++)
-            cout << i+1<<". "<< this->afectiuni[i] << ",\n";
-        cout << this->nrAfectiuni<<". "<< this->afectiuni[nrAfectiuni - 1] << ".\n\n";
+            cout << i + 1 << ". " << this->afectiuni[i] << ",\n";
+        cout << this->nrAfectiuni << ". " << this->afectiuni[nrAfectiuni - 1] << ".\n\n";
     }
 
     // functie statica
@@ -357,13 +354,13 @@ public:
 
     // constructor de copiere
     Pacient(const Pacient& pacient) : CNP(pacient.CNP) {
-        nume = pacient.nume;
-        varsta = pacient.varsta;
-        nrTelefon = pacient.nrTelefon;
-        nrAfectiuni = pacient.nrAfectiuni;
-        afectiuni = new string[nrAfectiuni];
+        this->nume = pacient.nume;
+        this->varsta = pacient.varsta;
+        this->nrTelefon = pacient.nrTelefon;
+        this->nrAfectiuni = pacient.nrAfectiuni;
+        this->afectiuni = new string[nrAfectiuni];
         for (int i = 0; i < nrAfectiuni; i++) {
-            afectiuni[i] = pacient.afectiuni[i];
+            this->afectiuni[i] = pacient.afectiuni[i];
         }
         contorFisePacienti++;
     }
@@ -411,27 +408,29 @@ public:
     }
 
     void setAfectiuni(string* afectiuni, int nrAfectiuni) {
-    if (this->afectiuni != nullptr) {
-        delete[] this->afectiuni; // eliberez memoria alocata anterior
+        if (this->afectiuni != NULL) {
+            delete[] this->afectiuni; // eliberez memoria alocata anterior
+        }
+
+        this->nrAfectiuni = nrAfectiuni;
+        this->afectiuni = new string[nrAfectiuni];
+        for (int i = 0; i < nrAfectiuni; ++i) {
+            this->afectiuni[i] = afectiuni[i]; // aloc noul vector
+        }
     }
-    
-    this->nrAfectiuni = nrAfectiuni;
-    this->afectiuni = new string[nrAfectiuni];
-    for (int i = 0; i < nrAfectiuni; ++i) {
-        this->afectiuni[i] = afectiuni[i]; // aloc noul vector
-    }
-}
 
     // destructorul
-    ~Pacient(){
+    ~Pacient() {
         if (afectiuni != NULL)
             delete[] afectiuni;
-
     }
 
     // supraincarcarea operatorilor
     // = copiaza afectiunile unui pacient la altul
-    Pacient& operator=(const Pacient& other) {
+    Pacient& operator=(const Pacient& other) { // copiaza si numele si varsta, nr telefon etc ca dupa nu ti le mai arata corect in main
+        this->nume = other.nume;
+        this->varsta = other.varsta;
+        this->nrTelefon = other.nrTelefon;
         delete[] this->afectiuni;
         this->afectiuni = new string[other.nrAfectiuni];
         for (int i = 0; i < other.nrAfectiuni; i++) {
@@ -460,22 +459,22 @@ public:
     }
 
     // >> pentru citire
-   friend istream& operator>>(istream& input, Pacient& pacient) {
+    friend istream& operator>>(istream& input, Pacient& pacient) {
         cout << "Introduceti numele pacientului: ";
         getline(input, pacient.nume);
         cout << "Introduceti varsta: ";
         input >> pacient.varsta;
-        input.ignore(); 
+        input.ignore();
         cout << "Introduceti numarul de telefon: ";
         getline(input, pacient.nrTelefon);
         cout << "Introduceti numarul de afectiuni: ";
         input >> pacient.nrAfectiuni;
-        input.ignore(); 
-        delete[] pacient.afectiuni;
+        input.ignore();
+        if (pacient.afectiuni != NULL)  delete[] pacient.afectiuni;
         pacient.afectiuni = new string[pacient.nrAfectiuni];
         cout << "Introduceti afectiunile:\n";
         for (int i = 0; i < pacient.nrAfectiuni; ++i) {
-        getline(input, pacient.afectiuni[i]);
+            getline(input, pacient.afectiuni[i]);
         }
         return input;
     }
@@ -515,8 +514,8 @@ public:
 };
 int Pacient::contorFisePacienti = 0;
 
-class Aparatura : public Spital{
-private: 
+class Aparatura : public Spital {
+private:
     string denumire;
     float pret;
     string sectie;
@@ -527,22 +526,22 @@ private:
 
 public:
     // functii virtuale ale clasei abstracte Spital
-    virtual void ePacientulMajor(){}
-    virtual void istoricAfectiuni(){}
+    virtual void ePacientulMajor() {}
+    virtual void istoricAfectiuni() {}
 
-    virtual void eFolosit(){
-        if(this->nrMediciCareFolosescAparatul>0)cout<<"Aparatul este folosit";
-        else cout<<"Aparatul nu este folosit";
+    virtual void eFolosit() {
+        if (this->nrMediciCareFolosescAparatul > 0)cout << "Aparatul este folosit";
+        else cout << "Aparatul nu este folosit";
     }
 
     // declaratia de prietenie a functiei globale
     friend void afisareAparatura(const Aparatura& aparat);
 
     // constructor implicit
-    Aparatura(): marca("Comen"){
+    Aparatura() : marca("Comen") {
         this->denumire = "Electrocardiograf";
         this->pret = 13000;
-        this->sectie="Cardiologie";
+        this->sectie = "Cardiologie";
         this->nrMediciCareFolosescAparatul = 2;
         numeMediciCareFolosescAparatul = new string[nrMediciCareFolosescAparatul];
         numeMediciCareFolosescAparatul[0] = "Dr. Ionel Popescu";
@@ -550,17 +549,17 @@ public:
     }
 
     // constructor cu 1 parametru
-    Aparatura(string denumire): denumire(denumire), marca("Potec"){
+    Aparatura(string denumire) : denumire(denumire), marca("Potec") {
         this->pret = 40000;
-        this->sectie="Oftalmologie";
+        this->sectie = "Oftalmologie";
         this->nrMediciCareFolosescAparatul = 1;
         numeMediciCareFolosescAparatul = new string[nrMediciCareFolosescAparatul];
         numeMediciCareFolosescAparatul[0] = "Dr. Marcela Ionescu";
     }
 
     // constructor cu 2 parametri
-    Aparatura(string denumire, int pret): denumire(denumire), pret(pret), marca("Anke"){
-        this->sectie="Radiologie";
+    Aparatura(string denumire, int pret) : denumire(denumire), pret(pret), marca("Anke") {
+        this->sectie = "Radiologie";
         this->nrMediciCareFolosescAparatul = 3;
         numeMediciCareFolosescAparatul = new string[nrMediciCareFolosescAparatul];
         numeMediciCareFolosescAparatul[0] = "Dr. Andrei Popa";
@@ -569,20 +568,19 @@ public:
     }
 
     // functia ce modifica atributul static TVA pentru toate obiectele clasei
-    static void setTVA(float TVAnou) { 
+    static void setTVA(float TVAnou) {
         TVA = TVAnou;
     }
-    
+
     // constructor de copiere
     Aparatura(const Aparatura& aparatura) : marca(aparatura.marca) {
-        denumire = aparatura.denumire;
-        pret = aparatura.pret;
-        sectie = aparatura.sectie;
-        TVA = aparatura.TVA;
-        nrMediciCareFolosescAparatul = aparatura.nrMediciCareFolosescAparatul;
-        numeMediciCareFolosescAparatul = new string[nrMediciCareFolosescAparatul];
+        this->denumire = aparatura.denumire;
+        this->pret = aparatura.pret;
+        this->sectie = aparatura.sectie;
+        this->nrMediciCareFolosescAparatul = aparatura.nrMediciCareFolosescAparatul;
+        this->numeMediciCareFolosescAparatul = new string[nrMediciCareFolosescAparatul];
         for (int i = 0; i < nrMediciCareFolosescAparatul; i++) {
-            numeMediciCareFolosescAparatul[i] = aparatura.numeMediciCareFolosescAparatul[i];
+            this->numeMediciCareFolosescAparatul[i] = aparatura.numeMediciCareFolosescAparatul[i];
         }
     }
 
@@ -629,7 +627,7 @@ public:
     }
 
     void setNumeMediciCareFolosescAparatul(string* numeMedici, int nrMedici) {
-        if(numeMediciCareFolosescAparatul != nullptr) {
+        if (numeMediciCareFolosescAparatul != NULL) {
             delete[] numeMediciCareFolosescAparatul; // eliberez memoria alocata anterior
         }
 
@@ -642,12 +640,12 @@ public:
 
     // destructorul
     ~Aparatura() {
-        if (numeMediciCareFolosescAparatul != nullptr)
+        if (numeMediciCareFolosescAparatul != NULL)
             delete[] numeMediciCareFolosescAparatul;
     }
 
     // supraincarcare operatorilor
-    // = atribui numele medicilor care folosesc aparatul 
+    // = atribui numele medicilor care folosesc aparatul
     Aparatura& operator=(const Aparatura& other) {
         delete[] numeMediciCareFolosescAparatul;
         numeMediciCareFolosescAparatul = new string[other.nrMediciCareFolosescAparatul];
@@ -682,16 +680,16 @@ public:
         getline(input, aparatura.denumire);
         cout << "Introduceti pretul: ";
         input >> aparatura.pret;
-        input.ignore(); 
+        input.ignore();
         cout << "Introduceti sectia: ";
         getline(input, aparatura.sectie);
         cout << "Introduceti numarul de medici care folosesc aparatul: ";
         input >> aparatura.nrMediciCareFolosescAparatul;
-        input.ignore(); 
+        input.ignore();
 
         delete[] aparatura.numeMediciCareFolosescAparatul;
         aparatura.numeMediciCareFolosescAparatul = new string[aparatura.nrMediciCareFolosescAparatul];
-        
+
         cout << "Introduceti numele medicilor care folosesc aparatul:\n";
         for (int i = 0; i < aparatura.nrMediciCareFolosescAparatul; ++i) {
             cout << "Medic " << i + 1 << ": ";
@@ -706,7 +704,7 @@ public:
         for (int i = 0; i < aparat.nrMediciCareFolosescAparatul - 1; i++)
             output << aparat.numeMediciCareFolosescAparatul[i] << ", ";
         output << aparat.numeMediciCareFolosescAparatul[aparat.nrMediciCareFolosescAparatul - 1] << ".\n";
-    return output;
+        return output;
     }
 };
 float Aparatura::TVA = 0.19;
@@ -715,7 +713,7 @@ float Aparatura::TVA = 0.19;
 void afisareAparatura(const Aparatura& aparat) {
     cout << "Denumire aparat: " << aparat.denumire << "\nPret: " << aparat.pret << "\nSectie: " << aparat.sectie << "\nTVA: " << aparat.TVA << "\nMarca: " << aparat.marca << "\nMedicii care pot folosi aparatul sunt urmatorii: ";
     for (int i = 0; i < aparat.nrMediciCareFolosescAparatul - 1; i++)
-        cout <<aparat.numeMediciCareFolosescAparatul[i] << ", ";
+        cout << aparat.numeMediciCareFolosescAparatul[i] << ", ";
     cout << aparat.numeMediciCareFolosescAparatul[aparat.nrMediciCareFolosescAparatul - 1] << ".\n";
 }
 
@@ -726,24 +724,23 @@ private:
     bool decontataIntegral;
     string doctorCurant;
     Pacient beneficiar;
-
 public:
     // functiile virtuale din clasa abstracta Farmacie
-    virtual int cateIngredienteContine(){
+    virtual int cateIngredienteContine() {
         return 0;
     }
 
-    virtual void eDecontataReteta(){
-        if(this->decontataIntegral == 0) cout<<"Reteta nu este decontata integral:(\n";
-        else cout<<"Reteta este decontata integral:)\n";
+    virtual void eDecontataReteta() {
+        if (this->decontataIntegral == 0) cout << "Reteta nu este decontata integral:(\n";
+        else cout << "Reteta este decontata integral:)\n";
     };
-    
+
     // constructor implicit
-    Reteta() : medicamentPrescris(nullptr), decontataIntegral(false), doctorCurant(""), beneficiar() {}
+    Reteta() : medicamentPrescris(NULL), decontataIntegral(false), doctorCurant(""), beneficiar() {}
 
     // destructor
     ~Reteta() {
-        if(medicamentPrescris != NULL) 
+        if (medicamentPrescris != NULL)
             delete[] medicamentPrescris;
     }
 
@@ -799,23 +796,23 @@ public:
 
     // << afisarea unui obiect
     friend ostream& operator<<(ostream& out, const Reteta& reteta) {
-    out << "Medicament prescris: " << reteta.medicamentPrescris->getNume() << endl;
-    out << "Decontata integral: " << boolalpha << reteta.decontataIntegral << endl;
-    out << "Doctor curant: " << reteta.doctorCurant << endl;
-    out << "Beneficiar: " << reteta.beneficiar.getNume() << endl;
-    return out;
-}
+        out << "Medicament prescris: " << reteta.medicamentPrescris->getNume() << endl;
+        out << "Decontata integral: " << boolalpha << reteta.decontataIntegral << endl;
+        out << "Doctor curant: " << reteta.doctorCurant << endl;
+        out << "Beneficiar: " << reteta.beneficiar.getNume() << endl;
+        return out;
+    }
 
 
     // >> citirea unui obiect
     friend istream& operator>>(istream& in, Reteta& reteta) {
-        Medicament* med = new Medicament();
+        Medicament* med = new Medicament;
         Pacient pac;
-        cout << "Care dintre pacientii nostri este? "<<endl;
+        cout << "Care dintre pacientii nostri este? " << endl;
         in >> pac;
         reteta.setBeneficiar(pac);
 
-        cout << "Care medicament este prescris? "<<endl;
+        cout << "Care medicament este prescris? " << endl;
         in >> *med;
         reteta.setMedicamentPrescris(med);
 
@@ -826,12 +823,13 @@ public:
         in.ignore(); // ignora newline characters din inputul anterior, deoarece daca nu fac asta nu se poate realiza citirea
         getline(in, reteta.doctorCurant);
 
+        delete med; // dezalocarea memoriei necesare pentru pointerul de tip medicament
         return in;
     }
 };
 
 // clasa PreparatFarmaceutic aflată in relatie de is-a cu Medicament, se referă la un acele medicamente care sunt preparate direct de catre farmacist in diverse concentratii de medicamente
-class PreparatFarmaceutic : public Medicament{
+class PreparatFarmaceutic : public Medicament {
 private:
     float concentratie;
 public:
@@ -839,14 +837,14 @@ public:
     PreparatFarmaceutic() : Medicament(), concentratie(0.0) {}
 
     // constructor cu 1 parametru
-    PreparatFarmaceutic(string* ingredientePrincipale, int nrIngrediente):concentratie(0.1){
+    PreparatFarmaceutic(string* ingredientePrincipale, int nrIngrediente) :concentratie(0.1) {
         this->setIngredientePrincipale(ingredientePrincipale, nrIngrediente);
     }
 
     // functia de afisare
     void afisare() const {
         Medicament::afisare();
-        cout << "\nConcentratia preparatului farmaceutic: " << concentratie << endl;
+        cout << "\nConcentratia preparatului farmaceutic: " << concentratie << endl << endl;
     }
 
     // getteri si setteri
@@ -860,18 +858,18 @@ public:
 
     // supraincarcarea operatorului >> pentru citire
     friend istream& operator>>(istream& input, PreparatFarmaceutic& preparat) {
-        // folosesc op >> supraincarcat in clasa de baza Medicament
-        input >> static_cast<Medicament&>(preparat);
-        
-        // citesc atributele in plus ale PreparatFarmaceutic
+        // folosesc op de citire >> supraincarcat in clasa de baza Medicament pt a citit datele ce apartin clasei de baza medicament si sunt comune si clasei PreparatFarmaceutic
+        input >> static_cast<Medicament&>(preparat); // am folosit static_cast pt a converti obiectul de tip PreparatFarmaceutic intr-unul de tipul medicament pt a apela corect metoda operator>> definitia din cls de baza
+
+        // citesc atributul in plus al PreparatFarmaceutic
         cout << "Concentratia preparatului farmaceutic: ";
         input >> preparat.concentratie;
-        
+
         return input;
     }
 
     // destructor
-    ~PreparatFarmaceutic(){
+    ~PreparatFarmaceutic() {
     }
 };
 
@@ -883,8 +881,8 @@ public:
     // constructor implicit
     PacientSpecial() : Pacient(), boalaExtra("Febra Galbena") {}
 
-    // constructorul cu 1 parametru
-    PacientSpecial(string* afectiuni, int nrAfectiuni):boalaExtra("Coronavirus"){
+    // constructor cu 1 parametru
+    PacientSpecial(string* afectiuni, int nrAfectiuni) :boalaExtra("Coronavirus") {
         this->setAfectiuni(afectiuni, nrAfectiuni);
     }
 
@@ -905,15 +903,18 @@ public:
 
     // supraincarcarea operatorului >> pentru citire
     friend istream& operator>>(istream& input, PacientSpecial& pacient) {
-        input >> static_cast<Pacient&>(pacient); // folosesc op >> de citire din clasa de baza Pacient
+        input.ignore(); // am pus un ignore intrucat altfel sare peste numele pacientului special
+        input >> static_cast<Pacient&>(pacient); // folosesc op >> de citire din clasa de baza Pacient 
+        // am folosit static_cast pt a converti obiectul de tip PacientSpecial intr-unul de tipul Pacient pt a apela corect metoda operator>> definitia din clasa de baza
+
         cout << "Boala speciala a pacientului: "; // citesc atributul in plus al PacientSpecial
-        input >> pacient.boalaExtra;
-        
+        getline(input, pacient.boalaExtra);// cu input>> nu retine si cuvintele dupa space asa ca de asta folosesc getline
+
         return input;
     }
 
     // destructor
-    ~PacientSpecial(){
+    ~PacientSpecial() {
     }
 };
 
@@ -971,7 +972,7 @@ void afisareBinaraMedicament()
         cout << "Nu s-a putut deschide fisierul binar.\n";
         delete[] ingredientePrincipale;
     }
-} 
+}
 
 // citirea obiectelor de tip Medicament din fisierul binar
 void citireBinaraMedicament()
@@ -1023,8 +1024,8 @@ void afisareBinaraPacient()
 
     string nume = p1.getNume();
     int varsta = p1.getVarsta();
-    string nrTelefon = p1.getNrTelefon(); 
-    long CNP = p1.getCNP(); 
+    string nrTelefon = p1.getNrTelefon();
+    long CNP = p1.getCNP();
     int nrAfectiuni = p1.getNrAfectiuni();
     int sizeNume = nume.length();
     int sizeNrTelefon = nrTelefon.length();
@@ -1039,14 +1040,14 @@ void afisareBinaraPacient()
         afisareBinaraPacient.read((char*)&sizeNume, sizeof(int));
         nume.resize(sizeNume);
         afisareBinaraPacient.read(&nume[0], sizeNume);
-        
+
         afisareBinaraPacient.read((char*)&varsta, sizeof(int));
 
         afisareBinaraPacient.read((char*)&sizeNrTelefon, sizeof(int));
         nrTelefon.resize(sizeNrTelefon);
         afisareBinaraPacient.read(&nrTelefon[0], sizeNrTelefon);
 
-        
+
         afisareBinaraPacient.read((char*)&CNP, sizeof(long));
         afisareBinaraPacient.read((char*)&nrAfectiuni, sizeof(int));
 
@@ -1074,7 +1075,7 @@ void afisareBinaraPacient()
         cout << "Nu s-a putut deschide fisierul binar.\n";
         delete[] afectiuni;
     }
-} 
+}
 
 // citirea obiectelor de tip Pacient din fisierul binar
 void citireBinaraPacient()
@@ -1083,8 +1084,8 @@ void citireBinaraPacient()
 
     string nume = p1.getNume();
     int varsta = p1.getVarsta();
-    string nrTelefon = p1.getNrTelefon(); 
-    long CNP = p1.getCNP(); 
+    string nrTelefon = p1.getNrTelefon();
+    long CNP = p1.getCNP();
     int nrAfectiuni = p1.getNrAfectiuni();
     int sizeNume = nume.length();
     int sizeNrTelefon = nrTelefon.length();
@@ -1126,214 +1127,220 @@ int main() {
     // FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
     // pentru Medicament
     {
-    // creez obiectele de tip Medicament cu constructorii
-    Medicament medicament1; // constructor implicit
-    string ingrediente2[] = { "Ibuprofen", "Croscarmeloză sodică", "Celuloză microcristalină", "Amidon de porumb pregelatinizat" };
-    Medicament medicament2("Nurofen", 15.0, 4, ingrediente2); // constructor cu 4 parametri
-    string ingrediente3[] = {"Desloratadină", "Amidon pregelatinizat", "Stereat de magneziu"};
-    Medicament medicament3("Aerius", 20.0, ingrediente3); // constructor cu 3 parametri
+        // creez obiectele de tip Medicament cu constructorii
+        Medicament medicament1; // constructor implicit
+        string ingrediente2[] = { "Ibuprofen", "Croscarmeloză sodică", "Celuloză microcristalină", "Amidon de porumb pregelatinizat" };
+        Medicament medicament2("Nurofen", 15.0, 4, ingrediente2); // constructor cu 4 parametri
+        string ingrediente3[] = { "Desloratadină", "Amidon pregelatinizat", "Stereat de magneziu" };
+        Medicament medicament3("Aerius", 20.0, ingrediente3); // constructor cu 3 parametri
 
-    // afisez cele 3 obiecte de tip Medicament
-    modificaPretMedicament(medicament1, 12.5);
-    medicament1.afisare();
-    cout<<"\n";
-    medicament2.afisare();
-    cout<<"\n";
-    medicament3.afisare();
-    cout<<"\n";
+        // afisez cele 3 obiecte de tip Medicament
+        modificaPretMedicament(medicament1, 12.5);
+        medicament1.afisare();
+        cout << "\n";
+        medicament2.afisare();
+        cout << "\n";
+        medicament3.afisare();
+        cout << "\n";
 
-    // calcularea dozei recomandate pentru un exemplu - functie
-    double greutatePacient = 52; // Greutatea pacientului în kg
-    double concentratieMedicament3 = 0.5; // Concentrația medicamentului 3
+        // calcularea dozei recomandate pentru un exemplu - functie
+        double greutatePacient = 52; // greutatea pacientului în kg
+        double concentratieMedicament3 = 0.5; // concentratia medicamentului 3
 
-    double dozaRecomandata = Medicament::calculareDozaRecomandata(greutatePacient, concentratieMedicament3);
-    cout << "Doza recomandata de " << medicament3.getNume() << " pentru un pacient cu greutatea de " << greutatePacient << " kg si o concentratie de " << concentratieMedicament3 << " este " << dozaRecomandata << " grame.\n\n";
-        
-
-    // supraincarcarilor operatorilor 
-    Medicament medicament4("Ibuprofen", 10.0, 0, NULL); 
-    // operatorul = folosit pentru copiere
-    medicament4 = medicament2; 
-    medicament4.afisare();
-    cout<<endl;
-
-    // operatorul + folosit pentru a afla suma preturilor a 2 medicamente
-    float sumaPret = medicament4 + medicament2; 
-    cout << "Costul total pentru "<< medicament2.getNume() <<" si "<< medicament4.getNume() << " este: " << sumaPret << endl;
-
-    // operatorul - folosit pentru a afla diferenta de pret intre 2 medicamente
-    float diferentaPret = medicament2 - medicament4; 
-    cout << "Diferenta de pret dintre "<< medicament2.getNume() <<" si "<< medicament4.getNume() << " este: " << diferentaPret << endl;
-
-    // operatorul == folosit pentru a vedea daca 2 medicamente au acelasi numar de ingrediente
-    bool acelasiNrIngrediente = medicament4 == medicament2; // apelul operatorului ==
-    cout << "Au acelasi numar de ingrediente "<< medicament2.getNume() <<" si "<< medicament3.getNume() <<"? "<< acelasiNrIngrediente << endl;
+        double dozaRecomandata = Medicament::calculareDozaRecomandata(greutatePacient, concentratieMedicament3);
+        cout << "Doza recomandata de " << medicament3.getNume() << " pentru un pacient cu greutatea de " << greutatePacient << " kg si o concentratie de " << concentratieMedicament3 << " este " << dozaRecomandata << " grame.\n\n";
 
 
-    // testarea getterilor si a setterilor in main
-    medicament1.setNume("Nurofen");
-    cout << "Testarea daca setter Nume a functionat folosind un getter: " << medicament1.getNume() << endl;
+        // supraincarcarilor operatorilor
+        Medicament medicament4("Ibuprofen", 10.0, 0, NULL);
+        // operatorul = folosit pentru copierea ing
+        medicament4 = medicament2;
+        medicament4.afisare();
+        cout << endl;
 
-    medicament1.setPretCutie(13);
-    cout << "Testarea daca setter pretCutie a functionat folosind un getter: " << medicament1.getPretCutie() << endl;
+        // operatorul + folosit pentru a afla suma preturilor a 2 medicamente
+        float sumaPret = medicament4 + medicament2;
+        cout << "Costul total pentru " << medicament2.getNume() << " si " << medicament4.getNume() << " este: " << sumaPret << endl;
 
-    cout << "Testarea getter id: " << medicament1.getId() << endl;
-    cout << "Testarea getter contor: " << medicament2.getContor() << endl;
+        // operatorul - folosit pentru a afla diferenta de pret intre 2 medicamente
+        float diferentaPret = medicament2 - medicament4;
+        cout << "Diferenta de pret dintre " << medicament2.getNume() << " si " << medicament4.getNume() << " este: " << diferentaPret << endl;
 
-    string ingredienteNoi[] = {"Celuloza", "Lactoza"};
-    medicament1.setIngredientePrincipale(ingredienteNoi, 2);
-    cout << "Testarea daca setter nrIngrediente a funcitonat folosind getter: " << medicament1.getNrIngrediente() << endl;
-    cout << "Testarea daca setter ingredientePrincipale a functionat folosind getter:\n";
-    string* ingredienteG = medicament1.getIngredientePrincipale();
-    for (int i = 0; i < medicament1.getNrIngrediente(); i++) {
+        // operatorul == folosit pentru a vedea daca 2 medicamente au acelasi numar de ingrediente
+        bool acelasiNrIngrediente = medicament4 == medicament2; // apelul operatorului ==
+        cout << "Au acelasi numar de ingrediente " << medicament2.getNume() << " si " << medicament3.getNume() << "? " << acelasiNrIngrediente << endl;
+
+
+        // testarea getterilor si a setterilor in main
+        medicament1.setNume("Nurofen");
+        cout << "Testarea daca setter Nume a functionat folosind un getter: " << medicament1.getNume() << endl;
+
+        medicament1.setPretCutie(13);
+        cout << "Testarea daca setter pretCutie a functionat folosind un getter: " << medicament1.getPretCutie() << endl;
+
+        cout << "Testarea getter id: " << medicament1.getId() << endl;
+        cout << "Testarea getter contor: " << medicament2.getContor() << endl;
+
+        string ingredienteNoi[] = { "Celuloza", "Lactoza" };
+        medicament1.setIngredientePrincipale(ingredienteNoi, 2);
+        cout << "Testarea daca setter nrIngrediente a funcitonat folosind getter: " << medicament1.getNrIngrediente() << endl;
+        cout << "Testarea daca setter ingredientePrincipale a functionat folosind getter:\n";
+        string* ingredienteG = medicament1.getIngredientePrincipale();
+        for (int i = 0; i < medicament1.getNrIngrediente(); i++) {
             cout << ingredienteG[i] << endl;
         }
-    cout << endl;
+        cout << endl;
 
-    cout << endl;
+        cout << endl;
     }
 
     // Pentru Pacient
     {
-    // creez obiectele de tip Pacient cu constructorii
-    Pacient pacient1;
-    Pacient pacient2("Maria Ionescu", 30);
-    Pacient pacient3("Teodor Marinescu");
+        // creez obiectele de tip Pacient cu constructorii
+        Pacient pacient1;
+        Pacient pacient2("Maria Ionescu", 30);
+        Pacient pacient3("Teodor Marinescu");
 
-    cout<<"Numarul total de pacienti pana acum este "<<Pacient::GetTotalPacienti()<<".\n";
+        cout << "Numarul total de pacienti pana acum este " << Pacient::GetTotalPacienti() << ".\n";
 
-    // afisez cele 3 obiecte de tip Pacient
-    pacient1.afisare();
-    cout<<"\n";
-    pacient2.afisare();
-    cout<<"\n";
-    pacient3.afisare();
-    cout<<"\n";
+        // afisez cele 3 obiecte de tip Pacient
+        pacient1.afisare();
+        cout << "\n";
+        pacient2.afisare();
+        cout << "\n";
+        pacient3.afisare();
+        cout << "\n";
 
-    // supraincarcarilor operatorilor 
-    Pacient pacient4("Elena Popa", 25);
-    // operatorul = folosit pentru atribuirea bolilor lui pacient2 lui pacient4
-    pacient4 = pacient2; 
-    pacient4.afisare();
-    cout<< endl;
+        // supraincarcarilor operatorilor
+        Pacient pacient4("Elena Popa", 25);
+        // operatorul = folosit pentru atribuirea bolilor lui pacient2 lui pacient4
+        pacient4 = pacient2;
+        pacient4.afisare();
+        cout << endl;
 
-    // operatorul + folosit pentru aflarea nr total de afectiuni a 2 pacienti
-    int sumaAfectiuni = pacient1 + pacient3;
-    cout << "Suma numarului de afectiuni ale lui " << pacient4.getNume() << " si " << pacient3.getNume() << " este " << sumaAfectiuni << endl;
+        // operatorul + folosit pentru aflarea nr total de afectiuni a 2 pacienti
+        int sumaAfectiuni = pacient1 + pacient3;
+        cout << "Suma numarului de afectiuni ale lui " << pacient4.getNume() << " si " << pacient3.getNume() << " este " << sumaAfectiuni << endl;
 
-    // operatorul - folosit pentru aflarea diferentei de varsta dintre 2 pacienti
-    int diferentaVarsta = pacient4 - pacient1;
-    cout << "Diferenta de varsta intre " << pacient4.getNume() << " si " << pacient1.getNume() << " este " << diferentaVarsta << " ani" << endl;
+        // operatorul - folosit pentru aflarea diferentei de varsta dintre 2 pacienti
+        int diferentaVarsta = pacient4 - pacient1;
+        cout << "Diferenta de varsta intre " << pacient4.getNume() << " si " << pacient1.getNume() << " este " << diferentaVarsta << " ani" << endl;
 
-    // operatorul == folosit pentru a afla daca 2 pacienti au aceeasi varsta
-    bool aceeasiVarsta = pacient1 == pacient3;
-    cout << pacient1.getNume() << " si " << pacient3.getNume() << " au aceeasi varsta? " << (aceeasiVarsta ? "Da" : "Nu") << endl;
+        // operatorul == folosit pentru a afla daca 2 pacienti au aceeasi varsta
+        bool aceeasiVarsta = pacient1 == pacient3;
+        cout << pacient1.getNume() << " si " << pacient3.getNume() << " au aceeasi varsta? " << (aceeasiVarsta ? "Da" : "Nu") << endl;
 
-    // testarea getterilor si a setterilor in main
-    pacient2.setNume("Dana Popescu");
-    cout << "Testarea setter Nume folosind un getter: " << pacient2.getNume() << endl;
+        // testarea getterilor si a setterilor in main
+        pacient2.setNume("Dana Popescu");
+        cout << "Testarea setter Nume folosind un getter: " << pacient2.getNume() << endl;
 
-    pacient2.setVarsta(54);
-    cout << "Testarea daca setter Varsta a functionat folosind un getter: " << pacient2.getVarsta() << endl;
+        pacient2.setVarsta(54);
+        cout << "Testarea daca setter Varsta a functionat folosind un getter: " << pacient2.getVarsta() << endl;
 
-    pacient2.setNrTelefon("07547384");
-    cout << "Testarea daca setter nrTelefon a functionat folosind un getter: " << pacient2.getNrTelefon() << endl;
+        pacient2.setNrTelefon("07547384");
+        cout << "Testarea daca setter nrTelefon a functionat folosind un getter: " << pacient2.getNrTelefon() << endl;
 
-    cout << "Testarea getter id: " << pacient2.getCNP() << endl;
-    cout << "Testarea getter contor: " << pacient2.getContorFisePacienti() << endl;
+        cout << "Testarea getter id: " << pacient2.getCNP() << endl;
+        cout << "Testarea getter contor: " << pacient2.getContorFisePacienti() << endl;
 
-    string afectiuni[] = {"Reumatism", "Hipotensiune arteriala"};
-    pacient2.setAfectiuni(afectiuni, 2);
-    cout << "Testare setter nrAfectiuni folosind getter: " << pacient2.getNrAfectiuni() << endl;
-    cout << "Testare setter afectiuni folosind getter:\n";
-    string* afectiuniG = pacient2.getAfectiuni();
-    for (int i = 0; i < pacient2.getNrAfectiuni(); i++) {
-        cout << afectiuniG[i] << endl;
-    }
-    cout << endl;
+        string afectiuni[] = { "Reumatism", "Hipotensiune arteriala" };
+        pacient2.setAfectiuni(afectiuni, 2);
+        cout << "Testare setter nrAfectiuni folosind getter: " << pacient2.getNrAfectiuni() << endl;
+        cout << "Testare setter afectiuni folosind getter:\n";
+        string* afectiuniG = pacient2.getAfectiuni();
+        for (int i = 0; i < pacient2.getNrAfectiuni(); i++) {
+            cout << afectiuniG[i] << endl;
+        }
+        cout << endl;
 
-    cout << endl;
+        cout << endl;
     }
 
     // Pentru Aparatura Medicala
     {
-    // creez obiectele de tip Aparatura cu constructorii
-    Aparatura aparat1;
-    Aparatura aparat2("Autorefractor");
-    Aparatura aparat3("Computer Tomograf", 41000);
+        // creez obiectele de tip Aparatura cu constructorii
+        Aparatura aparat1;
+        Aparatura aparat2("Autorefractor");
+        Aparatura aparat3("Computer Tomograf", 41000);
 
-    // afisez cele 3 obiecte de tip Aparatura
-    afisareAparatura(aparat1);
-    cout<<"\n";
-    afisareAparatura(aparat2);
-    cout<<"\n";
-    Aparatura::setTVA(0.21); // aici am folosit functia statica, crescand TVA-ul
-    afisareAparatura(aparat3);
-    cout<<"\n";
+        // afisez cele 3 obiecte de tip Aparatura
+        afisareAparatura(aparat1);
+        cout << "\n";
+        afisareAparatura(aparat2);
+        cout << "\n";
+        Aparatura::setTVA(0.21); // aici am folosit functia statica, crescand TVA-ul
+        afisareAparatura(aparat3);
+        cout << "\n";
 
 
-    // supraincarcarilor operatorilor 
-    // operatorul = folosit pentru atribuirea medicilor care folosesc aparat3 lui aparat4
-    Aparatura aparat4("Fluoroscop");
-    aparat4 = aparat3;
-    afisareAparatura(aparat4);
-    cout<<endl; 
+        // supraincarcarilor operatorilor
+        // operatorul = folosit pentru atribuirea medicilor care folosesc aparat3 lui aparat4
+        Aparatura aparat4("Fluoroscop");
+        aparat4 = aparat3;
+        afisareAparatura(aparat4);
+        cout << endl;
 
-    // operatorul + folosit pentru a afla costul total pentru achizitia a 2 aparate
-    float sumaPreturi = aparat1 + aparat2;
-    cout << "Costul total pentru achizita a aparatelor " << aparat1.getDenumire() << " si " << aparat2.getDenumire() << " este " << sumaPreturi << endl;
+        // operatorul + folosit pentru a afla costul total pentru achizitia a 2 aparate
+        float sumaPreturi = aparat1 + aparat2;
+        cout << "Costul total pentru achizita a aparatelor " << aparat1.getDenumire() << " si " << aparat2.getDenumire() << " este " << sumaPreturi << endl;
 
-    // operatorul - folosit pentru a afla diferenta de pret intre 2 aparate
-    float diferentaPret = aparat3 - aparat2;
-    cout << "Diferenta de pret intre " << aparat3.getDenumire() << " si " << aparat2.getDenumire() << " este " << diferentaPret << endl;
+        // operatorul - folosit pentru a afla diferenta de pret intre 2 aparate
+        float diferentaPret = aparat3 - aparat2;
+        cout << "Diferenta de pret intre " << aparat3.getDenumire() << " si " << aparat2.getDenumire() << " este " << diferentaPret << endl;
 
-    // operatorul == folosit pentru a vedea daca 2 aparate au acelasi pret
-    bool acelasiPret = aparat4 == aparat1;
-    cout << aparat4.getDenumire() << " si " << aparat1.getDenumire() << " au acelasi pret? " << (acelasiPret ? "Da" : "Nu") << endl;
+        // operatorul == folosit pentru a vedea daca 2 aparate au acelasi pret
+        bool acelasiPret = aparat4 == aparat1;
+        cout << aparat4.getDenumire() << " si " << aparat1.getDenumire() << " au acelasi pret? " << (acelasiPret ? "Da" : "Nu") << endl;
 
-    // testarea getterilor si a setterilor in main
-    aparat3.setDenumire("Bronhoscop");
-    cout << "Testarea setter Denumire folosind un getter: " << aparat3.getDenumire() << endl;
+        // testarea getterilor si a setterilor in main
+        aparat3.setDenumire("Bronhoscop");
+        cout << "Testarea setter Denumire folosind un getter: " << aparat3.getDenumire() << endl;
 
-    aparat3.setPret(5400);
-    cout << "Testarea daca setter Pret a functionat folosind un getter: " << aparat3.getPret() << endl;
+        aparat3.setPret(5400);
+        cout << "Testarea daca setter Pret a functionat folosind un getter: " << aparat3.getPret() << endl;
 
-    aparat3.setSectie("Pneumologie");
-    cout << "Testarea daca setter Sectie a functionat folosind un getter: " << aparat3.getSectie() << endl;
+        aparat3.setSectie("Pneumologie");
+        cout << "Testarea daca setter Sectie a functionat folosind un getter: " << aparat3.getSectie() << endl;
 
-    cout << "Testarea getter TVA: " << aparat3.getTVA() << endl;
-    cout << "Testarea getter marca: " << aparat3.getMarca() << endl;
+        cout << "Testarea getter TVA: " << aparat3.getTVA() << endl;
+        cout << "Testarea getter marca: " << aparat3.getMarca() << endl;
 
-    string mediciNume[] = {"Dr. Marian Popa", "Dr. Alisa Marcu", "Dr. Maria Ionescu"};
-    aparat3.setNumeMediciCareFolosescAparatul(mediciNume, 3);
-    cout << "Testare setter nrMedici folosind getter: " << aparat3.getNrMediciCareFolosescAparatul() << endl;
-    cout << "Testare setter numeMedici folosind getter:\n";
-    string* mediciG = aparat3.getNumeMediciCareFolosescAparatul();
-    for (int i = 0; i < aparat3.getNrMediciCareFolosescAparatul(); i++) {
-        cout << mediciG[i] << endl;
-    }
-    cout << endl;
-    cout << endl;
+        string mediciNume[] = { "Dr. Marian Popa", "Dr. Alisa Marcu", "Dr. Maria Ionescu" };
+        aparat3.setNumeMediciCareFolosescAparatul(mediciNume, 3);
+        cout << "Testare setter nrMedici folosind getter: " << aparat3.getNrMediciCareFolosescAparatul() << endl;
+        cout << "Testare setter numeMedici folosind getter:\n";
+        string* mediciG = aparat3.getNumeMediciCareFolosescAparatul();
+        for (int i = 0; i < aparat3.getNrMediciCareFolosescAparatul(); i++) {
+            cout << mediciG[i] << endl;
+        }
+        cout << endl;
+        cout << endl;
     }
 
     // FAZA 4: 3 vectori in main de tipul celor 3 clase de baza - Medicament, Pacient, Aparatura
     // declarari de dimensiuni + vectori in sine
     int nrMed, nrPac, nrApar;
-    cout<<"Dimensiunea vectorului de medicamente: ";
-    cin>>nrMed;
-    cout<<"Dimensiunea vectorului de pacienti: ";
-    cin>>nrPac;
-    cout<<"Dimensiunea vectorului de aparate medicale: ";
-    cin>>nrApar;
-    Medicament vectorMedicamente[nrMed];
-    Pacient vectorPacienti[nrPac];
-    Aparatura vectorAparate[nrApar];
+
+    cout << "Dimensiunea vectorului de medicamente: ";
+    cin >> nrMed;
+
+    cout << "Dimensiunea vectorului de pacienti: ";
+    cin >> nrPac;
+
+    cout << "Dimensiunea vectorului de aparate medicale: ";
+    cin >> nrApar;
+
+    //alocarea dinamica a memoriei folosind dimensiunile introduse de utilizator
+    Medicament* vectorMedicamente = new Medicament[nrMed];
+    Pacient* vectorPacienti = new Pacient[nrPac];
+    Aparatura* vectorAparate = new Aparatura[nrApar];
 
     // citirea vectorilor de la tastatură
-   cout << "Introduceti date pentru vectorul de medicamente:\n";
+    cout << "Introduceti date pentru vectorul de medicamente:\n";
     for (int i = 0; i < nrMed; ++i) {
+        //cin.ignore();
         cout << "Medicament " << i + 1 << ":\n";
-        cin >> vectorMedicamente[i];
+        cin >> vectorMedicamente[i];   
     }
 
     cout << "Introduceti date pentru vectorul de pacienti:\n";
@@ -1370,14 +1377,20 @@ int main() {
         cout << endl;
     }
 
+    // dezalocarea vectorilor
+    delete[] vectorMedicamente;
+    delete[] vectorPacienti;
+    delete[] vectorAparate;
+
     // FAZA 5: clasa Reteta ce se afla in relatie de has-a cu clasele initiale Medicament si Pacient
     Reteta reteta;
-    // testarea supraincarcarii operatorilor
+   // testarea supraincarcarilor operatorilor
     cin >> reteta; // testarea supraincarcarii operatorului de citire >>
+    cout << endl << endl;
     cout << reteta; // testarea supraincarcarii operatoruluide afisare<<
     Reteta retetaC = reteta; // testarea supraincarcii operatorului de atribuire =
 
-    // testarea getterilor si a setterilor
+   // testarea getterilor si a setterilor
     Pacient pacientR;
     reteta.setBeneficiar(pacientR);
     cout << "Beneficiar: " << reteta.getBeneficiar().getNume() << endl;
@@ -1390,16 +1403,19 @@ int main() {
 
     Medicament* medicamentR = new Medicament();
     reteta.setMedicamentPrescris(medicamentR);
-    cout << "Medicament prescris: " << reteta.getMedicamentPrescris()->getNume() << endl;  
+    cout << "Medicament prescris: " << reteta.getMedicamentPrescris() -> getNume() << endl;
+
+    // dezalocarea memoriei
+    delete medicamentR;
 
     // FAZA 6: citiri si afisari folosind fisiere text si binare
-    // citirea si afisarea obiectelor Medicament si Pacient din și în fisier de tip text  
+    // citirea si afisarea obiectelor Medicament si Pacient din și în fisier de tip text
     Medicament medicament5;
     Pacient pacient5;
     ofstream afisareTextMedicament("medicament.txt", ios::out);
     afisareTextMedicament << medicament5;
     ifstream citireTextMedicament("medicament.txt", ios::in);
-    
+
     ofstream afisareTextPacient("pacient.txt", ios::out);
     afisareTextPacient << pacient5;
     ifstream citireTextPacient("pacient.txt", ios::in);
@@ -1407,23 +1423,23 @@ int main() {
     // citirea si afisarea obiectelor Medicament si Pacient din si in fisier de tip binar
     afisareBinaraMedicament();
     citireBinaraMedicament();
-    
+
     afisareBinaraPacient();
     citireBinaraPacient();
 
-   // FAZA 7: clasele aflate in relatie de is-a - PreparatFarmaceutic si PacientSpecial
-   PreparatFarmaceutic preparat1;
-   cin >> preparat1;
-   cout << "\nDetaliile preparatului farmaceutic sunt:\n";
-   preparat1.afisare();
+    // FAZA 7: clasele aflate in relatie de is-a - PreparatFarmaceutic si PacientSpecial
+    PreparatFarmaceutic preparat1; // PreparatFarmaceutic is-a Medicament
+    cin >> preparat1;
+    cout << "\nDetaliile preparatului farmaceutic sunt:\n";
+    preparat1.afisare();
 
-   PacientSpecial pacientSpecial1;
-   cin >> pacientSpecial1;
-   cout << "\nDetaliile pacientului special sunt:\n";
-   pacientSpecial1.afisare();
+    PacientSpecial pacientSpecial1; // PacientSpecial is-a Pacient
+    cin >> pacientSpecial1;
+    cout << "\nDetaliile pacientului special sunt:\n";
+    pacientSpecial1.afisare();
 
-  // FAZA 8: clase abstracte, functii virtuale, late binding
-  // late binding pentru Farmacie
+    // FAZA 8: clase abstracte, functii virtuale, late binding
+    // late binding pentru Farmacie
     Medicament* pointerM;
     pointerM = new Medicament();
     cout << "Contine "<< pointerM->cateIngredienteContine() << " ingrediente.\n";
@@ -1452,8 +1468,14 @@ int main() {
         pointeri[i] = new Medicament();
     for(int i=0; i< 10; i++){
         cout << "Nr ingrediente in medicamentul " << i << ": " << pointeri[i]->cateIngredienteContine() << endl;
-    }   
-    
+    }
+     delete[] ingredienteM;
+
+     for(int i = 0; i < 10; i++){
+        delete pointeri[i];
+     }
+     delete pointeri;
+
     // late binding pentru Spital
     Pacient* pointerP;
     pointerP = new Pacient();
@@ -1488,7 +1510,19 @@ int main() {
 
     for(int i = 4 ; i < 10 ; i++)
         pointeri2[i] = new Pacient();
-    
+
     for(int i=0; i<10; i++)
         pointeri2[i]->istoricAfectiuni();
+
+    delete[] afectiuniP;
+
+    for (int i = 0; i < 10; i++) {
+        delete pointeri2[i];
+    }
+
+    delete[] pointeri2;
+
+    // late-binding e atunci cand alegerea functiei se face la executie
+    // early-binding e atunci cand alegerea functiei se face la compilare
+    return 0;
 }
