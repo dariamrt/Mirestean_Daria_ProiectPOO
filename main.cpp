@@ -185,13 +185,17 @@ public:
     }
 
     // supraincarcarea operatorilor
-    // = atribui ingredientele princiaple ale unui medicament altuia
+    // = atribui atributele unui medicament altuia
     Medicament& operator=(const Medicament& other) {
-        this->nrIngrediente = other.nrIngrediente;
-        delete[] ingredientePrincipale; // eliberez memoria alocată anterior pentru ingredientePrincipale
-        this->ingredientePrincipale = new string[nrIngrediente];
-        for (int i = 0; i < nrIngrediente; i++) {
-            this->ingredientePrincipale[i] = other.ingredientePrincipale[i];
+        if(this!=&other){
+            this->nume = other.nume;
+            this->pretCutie = other.pretCutie;
+            this->nrIngrediente = other.nrIngrediente;
+            delete[] ingredientePrincipale; // eliberez memoria alocată anterior pentru ingredientePrincipale
+            this->ingredientePrincipale = new string[nrIngrediente];
+            for (int i = 0; i < nrIngrediente; i++) {
+                this->ingredientePrincipale[i] = other.ingredientePrincipale[i];
+            }
         }
         return *this;
     }
@@ -267,10 +271,9 @@ public:
 
     // << pentru afisare din fisier
     friend ofstream& operator<<(ofstream& output, const Medicament& medicament) {
-        output << medicament.nume << endl << medicament.pretCutie << endl << medicament.id << medicament.contor << endl << medicament.nrIngrediente;
-        for (int i = 0; i < medicament.nrIngrediente - 1; i++)
-            output << medicament.ingredientePrincipale[i] << " ";
-        output << medicament.ingredientePrincipale[medicament.nrIngrediente - 1] << endl;
+        output << medicament.nume << endl << medicament.pretCutie << endl << medicament.id << endl << medicament.contor << endl << medicament.nrIngrediente << endl;
+        for (int i = 0; i < medicament.nrIngrediente; i++)
+            output << medicament.ingredientePrincipale[i] << endl;
         return output;
     }
 };
@@ -484,34 +487,36 @@ public:
 
     // << pentru afisare
     friend ostream& operator<<(ostream& output, const Pacient& pacient) {
-        output << "Total pacienti inregistrati pana acum: " << contorFisePacienti << "\nPacient: " << pacient.nume << "\nVarsta: " << pacient.varsta << " ani\nCNP: " << pacient.CNP << "\nNr. telefon: " << pacient.nrTelefon << "\nAcesta sufera de " << pacient.nrAfectiuni << " afectiuni:\n";
-        for (int i = 0; i < pacient.nrAfectiuni - 1; i++)
-            output << i + 1 << ". " << pacient.afectiuni[i] << ",\n";
-        output << pacient.nrAfectiuni << ". " << pacient.afectiuni[pacient.nrAfectiuni - 1] << ".\n\n";
+        output << "Total pacienti inregistrati: " << contorFisePacienti << "\nPacient: " << pacient.nume << "\nVarsta: " << pacient.varsta << " ani\nCNP: " << pacient.CNP << "\nNr. telefon: " << pacient.nrTelefon << "\nAcesta sufera de " << pacient.nrAfectiuni << " afectiuni:\n";
+        for (int i = 0; i < pacient.nrAfectiuni; i++)
+            output << pacient.afectiuni[i] << "\n";
         return output;
     }
 
     // >> pentru citirea din fișier
     friend ifstream& operator>>(ifstream& input, Pacient& pacient) {
-        input >> pacient.nume;
+        getline(input, pacient.nume);
         input >> pacient.varsta;
+        long long int aux;
+        input >> aux;
+        input >> pacient.nrTelefon;
         int val;
         input >> val;
-        input >> val;
         input >> pacient.nrAfectiuni;
+        input.ignore();
+        delete[] pacient.afectiuni;
         pacient.afectiuni = new string[pacient.nrAfectiuni];
-        for (int i = 0; i < pacient.nrAfectiuni; ++i) {
-            input >> pacient.afectiuni[i];
+        for (int i = 0; i < pacient.nrAfectiuni; i++) {
+            getline(input, pacient.afectiuni[i]);
         }
         return input;
     }
 
     // << pentru afisare in fisier
     friend ofstream& operator<<(ofstream& output, const Pacient& pacient) {
-        output << pacient.nume << endl << pacient.varsta << endl << pacient.CNP << pacient.contorFisePacienti << endl << pacient.nrTelefon << endl << pacient.nrAfectiuni << endl;
-        for (int i = 0; i < pacient.nrAfectiuni - 1; i++)
-            output << i + 1 << endl << pacient.afectiuni[i] << " ";
-        output << pacient.nrAfectiuni << " " << pacient.afectiuni[pacient.nrAfectiuni - 1] << endl;
+        output << pacient.nume << endl << pacient.varsta << endl << pacient.CNP << endl << pacient.nrTelefon << endl << contorFisePacienti << endl << pacient.nrAfectiuni << endl;
+        for (int i = 0; i < pacient.nrAfectiuni ; i++)
+            output << pacient.afectiuni[i] << endl;
         return output;
     }
 };
@@ -945,60 +950,6 @@ public:
 
 // FISIERE BINARE
 // afisarea obiectelor de tip Medicament in fisierul binar medicament.bin
-void afisareBinaraMedicament()
-{
-    Medicament m1;
-
-    string nume = m1.getNume();
-    float pretCutie = m1.getPretCutie();
-    int contor = m1.getContor(); //static
-    float id = m1.getId(); // const
-    int nrIngrediente = m1.getNrIngrediente();
-    int sizeNume = nume.length();
-    string* ingredientePrincipale = new string[nrIngrediente];
-    for (int i = 0; i < nrIngrediente; i++)
-        ingredientePrincipale[i] = m1.getIngredientePrincipale()[i];
-
-    ifstream afisareBinaraMedicament("medicament.bin", ios::binary);
-
-    if (afisareBinaraMedicament.is_open())
-    {
-        afisareBinaraMedicament.read((char*)&sizeNume, sizeof(int));
-        nume.resize(sizeNume);
-        afisareBinaraMedicament.read(&nume[0], sizeNume);
-
-        afisareBinaraMedicament.read((char*)&pretCutie, sizeof(float));
-        afisareBinaraMedicament.read((char*)&contor, sizeof(int));
-        afisareBinaraMedicament.read((char*)&id, sizeof(int));
-        afisareBinaraMedicament.read((char*)&nrIngrediente, sizeof(int));
-
-        for (int i = 0; i < nrIngrediente; i++)
-        {
-            int strSize;
-            afisareBinaraMedicament.read((char*)&strSize, sizeof(int));
-            ingredientePrincipale[i].resize(strSize);
-            afisareBinaraMedicament.read(&ingredientePrincipale[i][0], strSize);
-        }
-
-        afisareBinaraMedicament.close();
-
-        cout << nume << "\n" << pretCutie << "\n" << contor << "\n" << id << "\n" << nrIngrediente << "\n";
-        for (int i = 0; i < nrIngrediente; i++)
-        {
-            cout << ingredientePrincipale[i] << " ";
-        }
-        cout << "\n\n";
-
-        delete[] ingredientePrincipale;
-    }
-    else
-    {
-        cout << "Nu s-a putut deschide fisierul binar.\n";
-        delete[] ingredientePrincipale;
-    }
-}
-
-// citirea obiectelor de tip Medicament din fisierul binar
 void citireBinaraMedicament()
 {
     Medicament m1;
@@ -1013,25 +964,78 @@ void citireBinaraMedicament()
     for (int i = 0; i < nrIngrediente; i++)
         ingredientePrincipale[i] = m1.getIngredientePrincipale()[i];
 
-    ofstream citireBinaraMedicament("medicament.bin", ios::binary | ios::out);
+    ifstream citireBinaraMedicament("medicament.bin", ios::binary);
 
     if (citireBinaraMedicament.is_open())
     {
-        citireBinaraMedicament.write((char*)&sizeNume, sizeof(int));
-        citireBinaraMedicament.write(&nume[0], sizeNume);
-        citireBinaraMedicament.write((char*)&pretCutie, sizeof(float));
-        citireBinaraMedicament.write((char*)&contor, sizeof(int));
-        citireBinaraMedicament.write((char*)&id, sizeof(float));
-        citireBinaraMedicament.write((char*)&nrIngrediente, sizeof(int));
+        citireBinaraMedicament.read((char*)&sizeNume, sizeof(int));
+        nume.resize(sizeNume);
+        citireBinaraMedicament.read(&nume[0], sizeNume);
+
+        citireBinaraMedicament.read((char*)&pretCutie, sizeof(float));
+        citireBinaraMedicament.read((char*)&contor, sizeof(int));
+        citireBinaraMedicament.read((char*)&id, sizeof(int));
+        citireBinaraMedicament.read((char*)&nrIngrediente, sizeof(int));
+
+        for (int i = 0; i < nrIngrediente; i++)
+        {
+            int strSize;
+            citireBinaraMedicament.read((char*)&strSize, sizeof(int));
+            ingredientePrincipale[i].resize(strSize);
+            citireBinaraMedicament.read(&ingredientePrincipale[i][0], strSize);
+        }
+
+        citireBinaraMedicament.close();
+
+        cout << "Denumire medicament: " << nume << "\nPretul unei cutii: " << pretCutie << "\nContor medicamente: " << contor << "\nID: " << id << "\nNr. ingrediente continute: " << nrIngrediente << "\nAceste ingrediente sunt:\n";
+        for (int i = 0; i < nrIngrediente; i++){
+            cout << ingredientePrincipale[i] << "\n";
+        }
+        cout << "\n\n";
+
+        delete[] ingredientePrincipale;
+    }
+    else
+    {
+        cout << "Nu s-a putut deschide fisierul binar.\n";
+        delete[] ingredientePrincipale;
+    }
+}
+
+// citirea obiectelor de tip Medicament din fisierul binar
+void afisareBinaraMedicament()
+{
+    Medicament m1;
+
+    string nume = m1.getNume();
+    float pretCutie = m1.getPretCutie();
+    int contor = m1.getContor(); //static
+    float id = m1.getId(); // const
+    int nrIngrediente = m1.getNrIngrediente();
+    int sizeNume = nume.length();
+    string* ingredientePrincipale = new string[nrIngrediente];
+    for (int i = 0; i < nrIngrediente; i++)
+        ingredientePrincipale[i] = m1.getIngredientePrincipale()[i];
+
+    ofstream afisareBinaraMedicament("medicament.bin", ios::binary | ios::out);
+
+    if (afisareBinaraMedicament.is_open())
+    {
+        afisareBinaraMedicament.write((char*)&sizeNume, sizeof(int));
+        afisareBinaraMedicament.write(&nume[0], sizeNume);
+        afisareBinaraMedicament.write((char*)&pretCutie, sizeof(float));
+        afisareBinaraMedicament.write((char*)&contor, sizeof(int));
+        afisareBinaraMedicament.write((char*)&id, sizeof(float));
+        afisareBinaraMedicament.write((char*)&nrIngrediente, sizeof(int));
 
         for (int i = 0; i < nrIngrediente; i++)
         {
             int strSize = ingredientePrincipale[i].length();
-            citireBinaraMedicament.write((char*)&strSize, sizeof(int));
-            citireBinaraMedicament.write(&ingredientePrincipale[i][0], strSize);
+            afisareBinaraMedicament.write((char*)&strSize, sizeof(int));
+            afisareBinaraMedicament.write(&ingredientePrincipale[i][0], strSize);
         }
 
-        citireBinaraMedicament.close();
+        afisareBinaraMedicament.close();
         delete[] ingredientePrincipale;
     }
     else
@@ -1041,67 +1045,7 @@ void citireBinaraMedicament()
     }
 }
 
-// afisarea obiectelor de tip Pacient in fisierul binar pacient.bin
-void afisareBinaraPacient()
-{
-    Pacient p1;
-
-    string nume = p1.getNume();
-    int varsta = p1.getVarsta();
-    string nrTelefon = p1.getNrTelefon();
-    long CNP = p1.getCNP();
-    int nrAfectiuni = p1.getNrAfectiuni();
-    int sizeNume = nume.length();
-    int sizeNrTelefon = nrTelefon.length();
-    string* afectiuni = new string[nrAfectiuni];
-    for (int i = 0; i < nrAfectiuni; i++)
-        afectiuni[i] = p1.getAfectiuni()[i];
-
-    ifstream afisareBinaraPacient("pacient.bin", ios::binary);
-
-    if (afisareBinaraPacient.is_open())
-    {
-        afisareBinaraPacient.read((char*)&sizeNume, sizeof(int));
-        nume.resize(sizeNume);
-        afisareBinaraPacient.read(&nume[0], sizeNume);
-
-        afisareBinaraPacient.read((char*)&varsta, sizeof(int));
-
-        afisareBinaraPacient.read((char*)&sizeNrTelefon, sizeof(int));
-        nrTelefon.resize(sizeNrTelefon);
-        afisareBinaraPacient.read(&nrTelefon[0], sizeNrTelefon);
-
-
-        afisareBinaraPacient.read((char*)&CNP, sizeof(long));
-        afisareBinaraPacient.read((char*)&nrAfectiuni, sizeof(int));
-
-        for (int i = 0; i < nrAfectiuni; i++)
-        {
-            int strSize;
-            afisareBinaraPacient.read((char*)&strSize, sizeof(int));
-            afectiuni[i].resize(strSize);
-            afisareBinaraPacient.read(&afectiuni[i][0], strSize);
-        }
-
-        afisareBinaraPacient.close();
-
-        cout << nume << "\n" << varsta << "\n" << nrTelefon << "\n" << CNP << "\n" << nrAfectiuni << "\n";
-        for (int i = 0; i < nrAfectiuni; i++)
-        {
-            cout << afectiuni[i] << " ";
-        }
-        cout << "\n\n";
-
-        delete[] afectiuni;
-    }
-    else
-    {
-        cout << "Nu s-a putut deschide fisierul binar.\n";
-        delete[] afectiuni;
-    }
-}
-
-// citirea obiectelor de tip Pacient din fisierul binar
+// citirea obiectelor de tip Pacient in fisierul binar pacient.bin
 void citireBinaraPacient()
 {
     Pacient p1;
@@ -1109,7 +1053,8 @@ void citireBinaraPacient()
     string nume = p1.getNume();
     int varsta = p1.getVarsta();
     string nrTelefon = p1.getNrTelefon();
-    long CNP = p1.getCNP();
+    int contorFisePacienti = p1.getContorFisePacienti();
+    long long int CNP = p1.getCNP();
     int nrAfectiuni = p1.getNrAfectiuni();
     int sizeNume = nume.length();
     int sizeNrTelefon = nrTelefon.length();
@@ -1117,35 +1062,92 @@ void citireBinaraPacient()
     for (int i = 0; i < nrAfectiuni; i++)
         afectiuni[i] = p1.getAfectiuni()[i];
 
-    ofstream citireBinaraPacient("pacient.bin", ios::binary | ios::out);
+    ifstream citireBinaraPacient("pacient.bin", ios::binary);
 
     if (citireBinaraPacient.is_open())
     {
-        citireBinaraPacient.write((char*)&sizeNume, sizeof(int));
-        citireBinaraPacient.write(&nume[0], sizeNume);
-        citireBinaraPacient.write((char*)&varsta, sizeof(int));
-        citireBinaraPacient.write((char*)&sizeNrTelefon, sizeof(int));
-        citireBinaraPacient.write(&nume[0], sizeNrTelefon);
-        citireBinaraPacient.write((char*)&CNP, sizeof(long));
-        citireBinaraPacient.write((char*)&nrAfectiuni, sizeof(int));
+        citireBinaraPacient.read((char*)&sizeNume, sizeof(int));
+        nume.resize(sizeNume);
+        citireBinaraPacient.read(&nume[0], sizeNume);
 
-        for (int i = 0; i < nrAfectiuni; i++)
-        {
-            int strSize = afectiuni[i].length();
-            citireBinaraPacient.write((char*)&strSize, sizeof(int));
-            citireBinaraPacient.write(&afectiuni[i][0], strSize);
+        citireBinaraPacient.read((char*)&varsta, sizeof(int));
+
+        citireBinaraPacient.read((char*)&sizeNrTelefon, sizeof(int));
+        nrTelefon.resize(sizeNrTelefon);
+        citireBinaraPacient.read(&nrTelefon[0], sizeNrTelefon);
+
+        citireBinaraPacient.read((char*)&contorFisePacienti, sizeof(int));
+        citireBinaraPacient.read((char*)&CNP, sizeof(long long int));
+        citireBinaraPacient.read((char*)&nrAfectiuni, sizeof(int));
+
+        for (int i = 0; i < nrAfectiuni; i++){
+            int strSize;
+            citireBinaraPacient.read((char*)&strSize, sizeof(int));
+            afectiuni[i].resize(strSize);
+            citireBinaraPacient.read(&afectiuni[i][0], strSize);
         }
 
         citireBinaraPacient.close();
+
+        cout << "Nume pacient: " << nume << "\nVarsta: " << varsta << "\nNr. telefon: " << nrTelefon << "\nContorizare fise pacienti: " << contorFisePacienti << "\nCNP: " << CNP << "\nNr. afectiuni: " << nrAfectiuni << "\nAfectiuni:\n";
+        for (int i = 0; i < nrAfectiuni; i++){
+            cout << afectiuni[i] << "\n";
+        }
+        cout << "\n\n";
+
         delete[] afectiuni;
-    }
-    else
-    {
-        cout << "Nu am putut deschide fisierul binar. \n";
+    } else {
+        cout << "Nu s-a putut deschide fisierul binar.\n";
         delete[] afectiuni;
     }
 }
 
+// afisarea obiectelor de tip Pacient din fisierul binar
+void afisareBinaraPacient()
+{
+    Pacient p1;
+
+    string nume = p1.getNume();
+    int varsta = p1.getVarsta();
+    string nrTelefon = p1.getNrTelefon();
+    int contorFisePacienti = p1.getContorFisePacienti();
+    long long int CNP = p1.getCNP();
+    int nrAfectiuni = p1.getNrAfectiuni();
+    int sizeNume = nume.length();
+    int sizeNrTelefon = nrTelefon.length();
+    string* afectiuni = new string[nrAfectiuni];
+    for (int i = 0; i < nrAfectiuni; i++)
+        afectiuni[i] = p1.getAfectiuni()[i];
+
+    ofstream afisareBinaraPacient("pacient.bin", ios::binary | ios::out);
+
+    if (afisareBinaraPacient.is_open())
+    {
+        afisareBinaraPacient.write((char*)&sizeNume, sizeof(int));
+        afisareBinaraPacient.write(&nume[0], sizeNume);
+
+        afisareBinaraPacient.write((char*)&varsta, sizeof(int));
+
+        afisareBinaraPacient.write((char*)&sizeNrTelefon, sizeof(int));
+        afisareBinaraPacient.write(&nrTelefon[0], sizeNrTelefon);
+
+        afisareBinaraPacient.write((char*)&contorFisePacienti, sizeof(int));
+        afisareBinaraPacient.write((char*)&CNP, sizeof(long long int));
+        afisareBinaraPacient.write((char*)&nrAfectiuni, sizeof(int));
+
+        for (int i = 0; i < nrAfectiuni; i++){
+            int strSize = afectiuni[i].length();
+            afisareBinaraPacient.write((char*)&strSize, sizeof(int));
+            afisareBinaraPacient.write(&afectiuni[i][0], strSize);
+        }
+
+        afisareBinaraPacient.close();
+        delete[] afectiuni;
+    } else {
+        cout << "Nu am putut deschide fisierul binar. \n";
+        delete[] afectiuni;
+    }
+}
 
 int main() {
     /*
@@ -1178,7 +1180,7 @@ int main() {
 
         // supraincarcarilor operatorilor
         Medicament medicament4("Ibuprofen", 10.0, 0, NULL);
-        // operatorul = folosit pentru copierea ing
+        // operatorul = folosit pentru copierea atributelor
         medicament4 = medicament2;
         medicament4.afisare();
         cout << endl;
@@ -1219,7 +1221,7 @@ int main() {
         }
         cout << endl << endl;
     }
-    
+
     // Pentru Pacient
     {
         // creez obiectele de tip Pacient cu constructorii
@@ -1410,11 +1412,10 @@ int main() {
     delete[] vectorMedicamente;
     delete[] vectorPacienti;
     delete[] vectorAparate;
-    */
     
     // FAZA 5: clasa Reteta ce se afla in relatie de has-a cu clasele initiale Medicament si Pacient
     Reteta reteta;
-   // testarea supraincarcarilor operatorilor
+    // testarea supraincarcarilor operatorilor
     cin >> reteta; // testarea supraincarcarii operatorului de citire >>
     cout << endl;
     cout << "Obiectul citit de la tastatura de tip Reteta:\n";
@@ -1425,7 +1426,7 @@ int main() {
     cout << retetaC;
     cout << endl;
 
-   // testarea getterilor si a setterilor
+    // testarea getterilor si a setterilor
     Pacient pacientR;
     cout << "\nTestarea setterilor si a getterilor(pentru Beneficiar si Medicament, m-am folosit de constructorul implicit din clasele de baza Pacient si Medicament pt a crea niste obiecte :) : \n";
     reteta.setBeneficiar(pacientR);
@@ -1446,26 +1447,39 @@ int main() {
 
     // dezalocarea memoriei
     delete[] medicamentR;
-    /*
+
     // FAZA 6: citiri si afisari folosind fisiere text si binare
     // citirea si afisarea obiectelor Medicament si Pacient din și în fisier de tip text
     Medicament medicament5;
-    Pacient pacient5;
     ofstream afisareTextMedicament("medicament.txt", ios::out);
     afisareTextMedicament << medicament5;
+    afisareTextMedicament.close();
+    
+    Medicament medicament6;
     ifstream citireTextMedicament("medicament.txt", ios::in);
+    citireTextMedicament >> medicament6;
+    citireTextMedicament.close();
+    cout << medicament6 << endl;
 
+    Pacient pacient5;
     ofstream afisareTextPacient("pacient.txt", ios::out);
     afisareTextPacient << pacient5;
+    afisareTextPacient.close();
+    
+    Pacient pacient6;
     ifstream citireTextPacient("pacient.txt", ios::in);
+    citireTextPacient >> pacient6;
+    citireTextPacient.close();
+    cout << pacient6 << endl;
 
     // citirea si afisarea obiectelor Medicament si Pacient din si in fisier de tip binar
     afisareBinaraMedicament();
     citireBinaraMedicament();
-
+    
     afisareBinaraPacient();
     citireBinaraPacient();
-
+    */
+   
     // FAZA 7: clasele aflate in relatie de is-a - PreparatFarmaceutic si PacientSpecial
     PreparatFarmaceutic preparat1; // PreparatFarmaceutic is-a Medicament
     cin >> preparat1;
@@ -1476,7 +1490,8 @@ int main() {
     cin >> pacientSpecial1;
     cout << "\nDetaliile pacientului special sunt:\n";
     pacientSpecial1.afisare();
-
+    
+    /*
     // FAZA 8: clase abstracte, functii virtuale, late binding
     // late binding pentru Farmacie
     Medicament* pointerM;

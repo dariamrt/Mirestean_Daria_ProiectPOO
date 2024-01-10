@@ -1,7 +1,8 @@
 Ion Popescu
 21
-73948261571
+7394826157
 0712345678
-2
 1
-Astm 2 Insuficienta cardiaca
+2
+Astm
+Insuficienta cardiaca
