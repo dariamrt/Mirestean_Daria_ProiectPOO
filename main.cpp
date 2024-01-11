@@ -12,16 +12,18 @@ Totuși, am realizat și un README.md în care am oferit informații mai detalia
 */
 
 // două clase abstracte care să fie mostenite de catre clasele pe care le am deja de la inceput - Spital și Farmacie
+// clasa abstracta = clasa sablon ce nu poate fi instantiata singura, dar este menita a fi mostentita de alte clase(aproximativ asemanatoare unei interfete)
 // clasa abstracta Spital
 class Spital {
 private:
     string nume;
     string adresa;
 public:
-    // functii virtuale
+    // functii virtuale pure = o metoda a unei clase abstracte ce NU are implementare in clasa data(din acest motiv sunt egalate cu 0)
     virtual void ePacientulMajor() = 0; // afiseaza daca pacientul este sau nu major
     virtual void istoricAfectiuni() = 0; // afiseaza numele + ce afectiuni a avut pacientul de-a lungul timpului
     virtual void eFolosit() = 0; // afiseaza daca un aparat este sau nu folosit in spital
+    // toate clasele care mostenesc aceasta clasa abstracta trebuie sa aiba o metoda numita astfel, dar fiecare dintre ele va face ceva diferit
 
     // constructor implicit
     Spital() {
@@ -40,7 +42,7 @@ private:
     string nume;
     string adresa;
 public:
-    // functii virtuale
+    // functii virtuale pure = o metoda a unei clase abstracte ce NU are implementare in clasa data(din acest motiv sunt egalate cu 0)
     virtual int cateIngredienteContine() = 0; // ne afiseaza cate ingrediente contine un medicament
     virtual void eDecontataReteta() = 0; // aflam daca o reteta este sau nu decontata
 
@@ -230,11 +232,9 @@ public:
 
         cout << "Introduceti numarul de ingrediente principale: ";
         input >> medicament.nrIngrediente;
-
-            if (medicament.ingredientePrincipale != NULL) delete[] medicament.ingredientePrincipale;
-
+        
+        if (medicament.ingredientePrincipale != NULL) delete[] medicament.ingredientePrincipale;
         medicament.ingredientePrincipale = new string[medicament.nrIngrediente];
-
         cout << "Introduceti ingredientele principale:\n";
         for (int i = 0; i < medicament.nrIngrediente; ++i) {
             input >> ws;
@@ -857,8 +857,9 @@ public:
     }
 };
 
-// clasa PreparatFarmaceutic aflată in relatie de is-a cu Medicament, se referă la un acele medicamente care sunt preparate direct de catre farmacist in diverse concentratii de medicamente
-class PreparatFarmaceutic : public Medicament {
+// clasa PreparatFarmaceutic aflată in relatie de is-a cu Medicament, mostenirea este publica, se referă la un acele medicamente care sunt preparate direct de catre farmacist in diverse concentratii de medicamente
+// PreparatFarmaceutic is-a Medicament, dar intr-o concentratie speciala
+class PreparatFarmaceutic : public Medicament { 
 private:
     float concentratie;
 public:
@@ -871,9 +872,9 @@ public:
     }
 
     // functia de afisare
-    void afisare() const {
+    void afisare() const { // este const deoarece nu modifica starea obiectului asupra caruia apelam
         Medicament::afisare();
-        cout << "\nConcentratia preparatului farmaceutic: " << concentratie << endl << endl;
+        cout << "Concentratia preparatului farmaceutic: " << concentratie << endl << endl;
     }
 
     // getteri si setteri
@@ -903,6 +904,7 @@ public:
 };
 
 // clasa PacientSpecial in relatie de is-a cu Pacient, se referă la acei pacienti special cu boli rare precum boala galbena
+// PacientSpecial is-a Pacient care are o boala extra, adica o boala rara, ce nu are poate un tratament specific, necesita extra de atentie, afecteaza un segment foarte redus al oamenilor(exemplu: sindromul SED)
 class PacientSpecial : public Pacient {
 private:
     string boalaExtra;
@@ -916,7 +918,7 @@ public:
     }
 
     // afisare
-    void afisare() const {
+    void afisare() const { // este const deoarece nu modifica starea obiectului asupra caruia apelam
         Pacient::afisare();
         cout << "Boala speciala a sa: " << boalaExtra << endl;
     }
@@ -946,7 +948,6 @@ public:
     ~PacientSpecial() {
     }
 };
-
 
 // FISIERE BINARE
 // afisarea obiectelor de tip Medicament in fisierul binar medicament.bin
@@ -1150,7 +1151,6 @@ void afisareBinaraPacient()
 }
 
 int main() {
-    /*
     // FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
     // pentru Medicament
     {
@@ -1478,8 +1478,7 @@ int main() {
     
     afisareBinaraPacient();
     citireBinaraPacient();
-    */
-   
+
     // FAZA 7: clasele aflate in relatie de is-a - PreparatFarmaceutic si PacientSpecial
     PreparatFarmaceutic preparat1; // PreparatFarmaceutic is-a Medicament
     cin >> preparat1;
@@ -1491,15 +1490,14 @@ int main() {
     cout << "\nDetaliile pacientului special sunt:\n";
     pacientSpecial1.afisare();
     
-    /*
     // FAZA 8: clase abstracte, functii virtuale, late binding
-    // late binding pentru Farmacie
-    Medicament* pointerM;
-    pointerM = new Medicament();
-    cout << "Contine "<< pointerM->cateIngredienteContine() << " ingrediente.\n";
+    // late binding pentru clasa abstracta Farmacie
+    Medicament* pointerM; // declar un pointer la un obiect de tip Medicament
+    pointerM = new Medicament(); // aloc dinamic un obiect de tip Medicament si ii stochez adresa in pointerul pointerM
+    cout << "Contine "<< pointerM->cateIngredienteContine() << " ingrediente.\n\n"; // late binding-ul va asigura apelul functiei specifice Medicament
     delete pointerM;
 
-    string* ingredienteM = new string[10];
+    string* ingredienteM = new string[10]; // declar un pointer la un array de string-uri pentru a simula lista de ingrediente
     ingredienteM[0] = "Ibuprofen";
     ingredienteM[1] = "Aspirina";
     ingredienteM[2] = "Microcristalina";
@@ -1510,35 +1508,36 @@ int main() {
     ingredienteM[7] = "Dioxid de titan";
     ingredienteM[8] = "Celuloza";
     ingredienteM[9] = "Stereat de magneziu";
-    pointerM = new PreparatFarmaceutic(ingredienteM, 10);
-    cout << "Contine " << pointerM->cateIngredienteContine()<<" ingrediente.\n";
+    pointerM = new PreparatFarmaceutic(ingredienteM, 10); 
+    cout << "Contine " << pointerM->cateIngredienteContine()<<" ingrediente.\n\n"; // late binding-ul va asigura apelul functiei specifice Medicament
     delete pointerM;
-
-    Farmacie** pointeri;
-    pointeri = new Farmacie * [10];
+ 
+    Farmacie** pointeri; // declar un pointer la un array de pointeri la Farmacie
+    pointeri = new Farmacie * [10]; // aloc spatiu pt array-ul de pointeri la Farmacie de care vorbeam in com de pe linia anterioara
     pointeri[0] = new Medicament();
     pointeri[1] = new PreparatFarmaceutic(ingredienteM, 10);
     for(int i = 2 ; i < 10 ; i++)
         pointeri[i] = new Medicament();
     for(int i=0; i< 10; i++){
-        cout << "Nr ingrediente in medicamentul " << i << ": " << pointeri[i]->cateIngredienteContine() << endl;
+        cout << "Nr ingrediente in medicamentul " << i << ": " << pointeri[i]->cateIngredienteContine() << endl;  // late binding-ul va asigura apelul functiei specifice Medicament
     }
-     delete[] ingredienteM;
+    delete[] ingredienteM; // elibereaza memoria alocata pentru array-ul de ingrediente
 
-     for(int i = 0; i < 10; i++){
-        delete pointeri[i];
-     }
-     delete pointeri;
-
-    // late binding pentru Spital
-    Pacient* pointerP;
-    pointerP = new Pacient();
-    cout << "Pacientul este major? " << endl;
-    pointerP->ePacientulMajor();
+    for(int i = 0; i < 10; i++){
+        delete pointeri[i]; // elibereaza memoria alocata pentru obiectele din array-ul de pointeri
+    }
+    delete pointeri; // elibereaza memoria alocata pentru array-ul de pointeri in sine
     cout << endl;
+
+    // late binding pentru clasa abstracta Spital
+    Pacient* pointerP; // declar un pointer la un obiect de tip Pacient 
+    pointerP = new Pacient(); // aloc dinamic un obiect de tip Pacient si ii stochez adresa in pointerul pointerP
+    cout << "Pacientul este major? " << "\n";
+    pointerP->ePacientulMajor();  // late binding-ul va asigura apelul functiei specifice Pacient
+    cout << "\n\n";
     delete pointerP;
 
-    string* afectiuniP = new string[10];
+    string* afectiuniP = new string[10]; // declar un pointer la un array de string-uri pentru a simula lista de afectiuni a pacientului
     afectiuniP[0] = "Gripa";
     afectiuniP[1] = "Reumatism";
     afectiuniP[2] = "Pneumonie";
@@ -1549,35 +1548,34 @@ int main() {
     afectiuniP[7] = "Hipotensiune arteriala";
     afectiuniP[8] = "Scolioza";
     afectiuniP[9] = "Hernie de disc";
-    pointerP = new PacientSpecial(afectiuniP, 10);
-
-    pointerP->istoricAfectiuni();
-    cout<<"\n";
+    pointerP = new PacientSpecial(afectiuniP, 10); 
+    pointerP->istoricAfectiuni(); // late binding-ul va asigura apelul functiei specifice Pacient
+    cout << "\n\n";
     delete pointerP;
-
-    Spital** pointeri2;
-    pointeri2 = new Spital * [10];
+ 
+    Spital** pointeri2;  // declar un pointer la un array de pointeri la Spital
+    pointeri2 = new Spital * [10]; // aloc spatiu pt array-ul de care vb pe linia anterioara
     pointeri2[0] = new Pacient();
     pointeri2[1] = new PacientSpecial(afectiuniP, 10);
     pointeri2[2] = new Pacient("Vasile Tudor", 43);
     pointeri2[3] = new Pacient("Mihai Mircea");
-
     for(int i = 4 ; i < 10 ; i++)
         pointeri2[i] = new Pacient();
 
     for(int i=0; i<10; i++)
-        pointeri2[i]->istoricAfectiuni();
+        pointeri2[i]->istoricAfectiuni();  // late binding-ul va asigura apelul functiei specifice Pacient
 
-    delete[] afectiuniP;
-
+    delete[] afectiuniP; // elibereaza memoria alocata pentru array-ul de afectiuni ale lui Pacient
     for (int i = 0; i < 10; i++) {
-        delete pointeri2[i];
+        delete pointeri2[i]; // elibereaza memoria alocata pentru obiectele din array-ul de pointeri
     }
+    delete[] pointeri2; // elibereaza memoria alocata pentru array-ul de pointeri in sine
 
-    delete[] pointeri2;
-
-    // late-binding e atunci cand alegerea functiei se face la executie
-    // early-binding e atunci cand alegerea functiei se face la compilare
+    /* 
+    late-binding e atunci cand alegerea functiei se face la executie => in cazul functiilor virtuale ale claselor abstracte este necesar deoarece
+    compilatorul nu poate decide static = in timpul compilarii la ce funcții să se facă apel
+    Pt ca functia se refera la o instanta a unei clase derivate, decizia despre ce functie specifică clasei derivate sa se apeleze trebuie luata la momentul rularii!!!
     */
+    // early-binding e atunci cand alegerea functiei se face la compilare
     return 0;
 }
