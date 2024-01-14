@@ -1371,7 +1371,6 @@ int main() {
     // citirea vectorilor de la tastatură
     cout << "Introduceti date pentru vectorul de medicamente:\n";
     for (int i = 0; i < nrMed; ++i) {
-        //cin.ignore();
         cout << "Medicament " << i + 1 << ":\n";
         cin >> vectorMedicamente[i];   
     }
