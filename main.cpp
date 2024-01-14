@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <cstring>
+#include <vector>
 #include <cmath>
 #include <fstream>
 #include <istream>
@@ -1348,7 +1349,8 @@ int main() {
         cout << endl;
     }
     
-    // FAZA 4: 3 vectori in main de tipul celor 3 clase de baza - Medicament, Pacient, Aparatura
+    // FAZA 4: 3 vectori in main de tipul celor 3 clase de baza - Medicament, Pacient, Aparatura + o matrice de obiecte de tip Medicament
+    // VECTORI
     // declarari de dimensiuni + vectori in sine
     int nrMed, nrPac, nrApar;
 
@@ -1413,6 +1415,30 @@ int main() {
     delete[] vectorPacienti;
     delete[] vectorAparate;
     
+    // MATRICE 
+    // matricea de obiecte ale clasei Medicament
+    // pentru a da mai multa diversitate in cod si a experimenta mai mult, am folosit 
+    vector<vector<Medicament>> matriceMedicamente(2, vector<Medicament>(3)); // pana la urma o matrice e un vector de vectori :)
+    // primul parametru -> 2 ne arata ca vom avea 2 vectori in matrice = 2 rânduri
+    // al doilea parametru -> vector<Medicament>(3) ne arată că fiecare vector va avea 3 obiecte de clasa Medicament = 3 coloane
+
+    // citirea obiectelor din matricea de Medicamente
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << "Elementul [" << i << "][" << j << "]: ";
+            cin >> matriceMedicamente[i][j];
+        }
+    }
+
+    // afisarea obiectelor din matricea de Medicamente
+    cout << "\nObiectele din matrice sunt:\n";
+    for (int i = 0; i < 2; i++) {
+        for (int j = 0; j < 3; j++) {
+            cout << "Elementul [" << i << "][" << j << "]: ";
+            cout << matriceMedicamente[i][j] << "\n";
+        }
+    }
+
     // FAZA 5: clasa Reteta ce se afla in relatie de has-a cu clasele initiale Medicament si Pacient
     Reteta reteta;
     // testarea supraincarcarilor operatorilor
