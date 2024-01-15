@@ -824,7 +824,7 @@ public:
         out << "Beneficiar: " << reteta.beneficiar.getNume() << endl;
         out << "Medicamente prescrise:" << endl;
         for (int i = 0; i < reteta.nrMedicamentePrescrise; ++i) {
-            out << "Medicament " << i + 1 << ": " << reteta.medicamentePrescrise[i].getNume() << endl; // MODIFICARE FACUTA -> SA VERIFIC MAINE 
+            out << "Medicament " << i + 1 << ": " << reteta.medicamentePrescrise[i].getNume() << endl; 
         } 
         return out;
     }
@@ -1152,6 +1152,7 @@ void afisareBinaraPacient()
 }
 
 int main() {
+    /*
     // FAZA 1 + FAZA 2 + FAZA 3: crearea a trei obiecte din fiecare clasa, functii prietene, supraincarcare de operatori, getteri, setteri
     // pentru Medicament
     {
@@ -1413,18 +1414,18 @@ int main() {
     delete[] vectorMedicamente;
     delete[] vectorPacienti;
     delete[] vectorAparate;
-    
+
     // MATRICE 
     // matricea de obiecte ale clasei Medicament
     // pentru a da mai multa diversitate in cod si a experimenta mai mult, am folosit 
-    vector<vector<Medicament>> matriceMedicamente(2, vector<Medicament>(3)); // pana la urma o matrice e un vector de vectori :)
+    vector< vector<Medicament> > matriceMedicamente(2, vector<Medicament>(3)); // pana la urma o matrice e un vector de vectori :)
     // primul parametru -> 2 ne arata ca vom avea 2 vectori in matrice = 2 rânduri
     // al doilea parametru -> vector<Medicament>(3) ne arată că fiecare vector va avea 3 obiecte de clasa Medicament = 3 coloane
 
     // citirea obiectelor din matricea de Medicamente
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 3; j++) {
-            cout << "Elementul [" << i << "][" << j << "]: ";
+            cout << "Elementul [" << i << "][" << j << "]:\n";
             cin >> matriceMedicamente[i][j];
         }
     }
@@ -1433,11 +1434,12 @@ int main() {
     cout << "\nObiectele din matrice sunt:\n";
     for (int i = 0; i < 2; i++) {
         for (int j = 0; j < 3; j++) {
-            cout << "Elementul [" << i << "][" << j << "]: ";
+            cout << "Elementul [" << i << "][" << j << "]:\n";
             cout << matriceMedicamente[i][j] << "\n";
         }
+        cout << "\n";
     }
-
+    */
     // FAZA 5: clasa Reteta ce se afla in relatie de has-a cu clasele initiale Medicament si Pacient
     Reteta reteta;
     // testarea supraincarcarilor operatorilor
@@ -1473,6 +1475,7 @@ int main() {
     // dezalocarea memoriei
     delete[] medicamentR;
 
+    /*
     // FAZA 6: citiri si afisari folosind fisiere text si binare
     // citirea si afisarea obiectelor Medicament si Pacient din și în fisier de tip text
     Medicament medicament5;
@@ -1596,11 +1599,11 @@ int main() {
     }
     delete[] pointeri2; // elibereaza memoria alocata pentru array-ul de pointeri in sine
 
-    /* 
-    late-binding e atunci cand alegerea functiei se face la executie => in cazul functiilor virtuale ale claselor abstracte este necesar deoarece
-    compilatorul nu poate decide static = in timpul compilarii la ce funcții să se facă apel
-    Pt ca functia se refera la o instanta a unei clase derivate, decizia despre ce functie specifică clasei derivate sa se apeleze trebuie luata la momentul rularii!!!
-    */
+    // late-binding e atunci cand alegerea functiei se face la executie => in cazul functiilor virtuale ale claselor abstracte este necesar deoarece
+    // compilatorul nu poate decide static = in timpul compilarii la ce funcții să se facă apel
+    // pt ca functia se refera la o instanta a unei clase derivate, decizia despre ce functie specifică clasei derivate sa se apeleze trebuie luata la momentul rularii!!!
+    
     // early-binding e atunci cand alegerea functiei se face la compilare
+    */
     return 0;
 }
